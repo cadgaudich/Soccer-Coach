@@ -1,7 +1,7 @@
 // Coach PWA Service Worker
 // Caching-Strategie: Cache-First für statische Dateien, Network-First für HTML (damit Updates ankommen)
 
-const CACHE_VERSION = 'coach-v4';
+const CACHE_VERSION = 'coach-v6';
 const STATIC_ASSETS = [
   './',
   './Coach.html',
