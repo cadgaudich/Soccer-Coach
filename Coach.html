@@ -299,6 +299,52 @@ tr:hover .row-actions { opacity: 1; }
 .termin-action-btn:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-bg); }
 .termin-action-btn .icon { font-size: 16px; }
 
+.termin-view-summary {
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px 16px;
+  margin-bottom: 14px;
+}
+.termin-view-head {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 12px;
+}
+.termin-view-date {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 56px; padding: 8px 10px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); flex-shrink: 0;
+}
+.termin-view-date-d { font-size: 22px; font-weight: 600; line-height: 1; }
+.termin-view-date-m { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+.termin-view-title {
+  font-size: 17px; font-weight: 500; margin: 0 0 4px;
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.termin-view-subtitle { font-size: 13px; color: var(--text-2); }
+.termin-view-rows { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+.termin-view-row { display: flex; gap: 10px; align-items: baseline; }
+.termin-view-row-label { color: var(--text-2); min-width: 80px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.4px; }
+.termin-view-row-val { color: var(--text); flex: 1; white-space: pre-wrap; }
+
+.cal-choice-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.cal-choice-btn {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; min-height: 56px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  font-family: inherit; text-align: left; width: 100%;
+  text-decoration: none; color: var(--text);
+  transition: border-color 0.12s, background 0.12s;
+}
+.cal-choice-btn:hover { border-color: var(--accent); background: var(--accent-bg); }
+.cal-choice-icon { font-size: 24px; line-height: 1; flex-shrink: 0; }
+.cal-choice-body { flex: 1; min-width: 0; }
+.cal-choice-title { font-size: 15px; font-weight: 500; margin: 0; color: var(--text); }
+.cal-choice-desc { font-size: 12px; color: var(--text-2); margin-top: 2px; }
+.cal-choice-arrow { color: var(--text-3); font-size: 18px; flex-shrink: 0; }
+
 .aufst-list-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
@@ -1344,6 +1390,21 @@ tr:hover .row-actions { opacity: 1; }
   </div>
 </div>
 
+<div class="modal-overlay" id="cal-choice-modal">
+  <div class="modal" style="max-width: 460px;">
+    <div class="modal-header">
+      <h2 class="modal-title">In Kalender hinzufügen</h2>
+      <button class="icon-btn" id="cal-choice-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="cal-choice-body"></div>
+    <div class="modal-footer">
+      <div class="modal-footer-right">
+        <button class="btn" id="cal-choice-cancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="uebung-modal">
   <div class="modal">
     <div class="modal-header">
@@ -2160,6 +2221,7 @@ let editingSpielerId = null;
 let searchTerm = '';
 let editingTerminId = null;
 let pendingTermin = null;
+let terminModalEditMode = false;
 let terminFilter = 'kommend';
 let aufstellungenView = 'list';
 let editingAufstellungId = null;
@@ -2634,6 +2696,130 @@ function downloadIcsForTermin(termin) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+function buildCalendarUrlIso(termin) {
+  // Liefert {start, end, title, location, details} als ISO-Strings für externe Kalender-URLs
+  const d = parseISODate(termin.datum);
+  if (!d) return null;
+  const parseTime = (t) => {
+    if (!t || t.indexOf(':') < 0) return [0, 0];
+    const parts = t.split(':');
+    return [parseInt(parts[0], 10) || 0, parseInt(parts[1], 10) || 0];
+  };
+  const [sh, sm] = parseTime(termin.uhrzeit_start || '17:30');
+  const endTime = termin.uhrzeit_ende || addHour(termin.uhrzeit_start || '17:30', 1.5);
+  const [eh, em] = parseTime(endTime);
+
+  // YYYYMMDDTHHmmss (lokale Zeit ohne TZ-Marker — Kalender interpretiert als lokale Zeit)
+  const startStr = d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + 'T' + pad2(sh) + pad2(sm) + '00';
+  const endStr = d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + 'T' + pad2(eh) + pad2(em) + '00';
+
+  // ISO 8601 mit Bindestrichen für Outlook
+  const isoStart = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + 'T' + pad2(sh) + ':' + pad2(sm) + ':00';
+  const isoEnd = d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) + 'T' + pad2(eh) + ':' + pad2(em) + ':00';
+
+  const team = (db.mannschaften || []).find(m => m.id === termin.mannschaft_id);
+  const teamName = team ? team.name : '';
+  const typLabel = TYP_LABEL[termin.typ] || termin.typ;
+  const title = (termin.titel || typLabel) +
+    (termin.typ === 'spiel' && termin.gegner ? ' vs ' + termin.gegner : '') +
+    (teamName ? ' — ' + teamName : '');
+  const location = termin.typ === 'spiel'
+    ? (termin.heimspiel ? 'Heim' : 'Auswärts') + (termin.ort ? ' (' + termin.ort + ')' : '')
+    : (termin.ort || '');
+  const details = termin.notizen || '';
+
+  return {
+    googleStart: startStr,
+    googleEnd: endStr,
+    outlookStart: isoStart,
+    outlookEnd: isoEnd,
+    title: title,
+    location: location,
+    details: details
+  };
+}
+
+function getGoogleCalendarUrl(termin) {
+  const c = buildCalendarUrlIso(termin);
+  if (!c) return null;
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: c.title,
+    dates: c.googleStart + '/' + c.googleEnd,
+    details: c.details,
+    location: c.location
+  });
+  return 'https://calendar.google.com/calendar/render?' + params.toString();
+}
+
+function getOutlookCalendarUrl(termin) {
+  const c = buildCalendarUrlIso(termin);
+  if (!c) return null;
+  const params = new URLSearchParams({
+    path: '/calendar/action/compose',
+    rru: 'addevent',
+    subject: c.title,
+    startdt: c.outlookStart,
+    enddt: c.outlookEnd,
+    body: c.details,
+    location: c.location
+  });
+  return 'https://outlook.live.com/calendar/0/deeplink/compose?' + params.toString();
+}
+
+function openCalendarChoice(termin) {
+  const gUrl = getGoogleCalendarUrl(termin);
+  const oUrl = getOutlookCalendarUrl(termin);
+  if (!gUrl) { alert('Termin braucht Datum und Uhrzeit, bevor er in den Kalender kann.'); return; }
+
+  const body = document.getElementById('cal-choice-body');
+  body.innerHTML =
+    '<p style="margin: 0 0 14px; font-size: 13px; color: var(--text-2);">Wo soll der Termin gespeichert werden?</p>' +
+    '<div class="cal-choice-list">' +
+      '<a class="cal-choice-btn" href="' + gUrl + '" target="_blank" rel="noopener" data-cal-action="google">' +
+        '<span class="cal-choice-icon">📆</span>' +
+        '<div class="cal-choice-body">' +
+          '<p class="cal-choice-title">Google Calendar</p>' +
+          '<div class="cal-choice-desc">Öffnet Google direkt zum Eintragen</div>' +
+        '</div>' +
+        '<span class="cal-choice-arrow">›</span>' +
+      '</a>' +
+      '<a class="cal-choice-btn" href="' + oUrl + '" target="_blank" rel="noopener" data-cal-action="outlook">' +
+        '<span class="cal-choice-icon">📅</span>' +
+        '<div class="cal-choice-body">' +
+          '<p class="cal-choice-title">Outlook (Web / Office 365)</p>' +
+          '<div class="cal-choice-desc">Öffnet Outlook im Browser</div>' +
+        '</div>' +
+        '<span class="cal-choice-arrow">›</span>' +
+      '</a>' +
+      '<button class="cal-choice-btn" data-cal-action="ics">' +
+        '<span class="cal-choice-icon">💾</span>' +
+        '<div class="cal-choice-body">' +
+          '<p class="cal-choice-title">Datei herunterladen (.ics)</p>' +
+          '<div class="cal-choice-desc">Für Apple Kalender, Outlook-Desktop und andere</div>' +
+        '</div>' +
+        '<span class="cal-choice-arrow">›</span>' +
+      '</button>' +
+    '</div>';
+
+  document.getElementById('cal-choice-modal').classList.add('open');
+
+  body.querySelectorAll('[data-cal-action="ics"]').forEach(btn => {
+    btn.onclick = () => {
+      downloadIcsForTermin(termin);
+      closeCalChoiceModal();
+    };
+  });
+  // Bei Google/Outlook nach Klick auch zumachen
+  body.querySelectorAll('[data-cal-action="google"], [data-cal-action="outlook"]').forEach(btn => {
+    btn.addEventListener('click', () => setTimeout(closeCalChoiceModal, 100));
+  });
+}
+
+function closeCalChoiceModal() {
+  document.getElementById('cal-choice-modal').classList.remove('open');
+}
+
 function shareTermin(termin) {
   const text = getTerminShareText(termin);
   const url = getTerminShareUrl(termin);
@@ -2670,8 +2856,8 @@ function promptFallback(text) {
 
 function openTerminModal(id) {
   editingTerminId = id || null;
-  const isEdit = !!id;
-  if (isEdit) {
+  const isExisting = !!id;
+  if (isExisting) {
     const orig = db.termine.find(t => t.id === id);
     if (!orig) return;
     pendingTermin = JSON.parse(JSON.stringify(orig));
@@ -2679,8 +2865,44 @@ function openTerminModal(id) {
     pendingTermin = mkTermin(db.meta.active_mannschaft_id, {});
   }
 
-  document.getElementById('termin-modal-title').textContent = isEdit ? 'Termin bearbeiten' : 'Termin hinzufügen';
-  document.getElementById('termin-modal-delete').style.visibility = isEdit ? 'visible' : 'hidden';
+  // Neue Termine direkt im Edit-Modus, bestehende standardmäßig im View-Modus
+  // Im Kids-Modus immer View
+  terminModalEditMode = !isExisting && appMode !== 'kids';
+  renderTerminModal();
+  document.getElementById('termin-modal').classList.add('open');
+}
+
+function renderTerminModal() {
+  if (!pendingTermin) return;
+  const isExisting = !!editingTerminId;
+  const titleEl = document.getElementById('termin-modal-title');
+  const deleteBtn = document.getElementById('termin-modal-delete');
+  const saveBtn = document.getElementById('termin-modal-save');
+  const cancelBtn = document.getElementById('termin-modal-cancel');
+
+  if (!terminModalEditMode && isExisting) {
+    // VIEW-Modus
+    titleEl.textContent = pendingTermin.titel || (TYP_LABEL[pendingTermin.typ] || 'Termin');
+    deleteBtn.style.visibility = appMode === 'kids' ? 'hidden' : 'visible';
+    if (saveBtn) {
+      saveBtn.textContent = appMode === 'kids' ? 'Schließen' : '✎ Bearbeiten';
+      saveBtn.dataset.action = appMode === 'kids' ? 'close' : 'enter-edit';
+      saveBtn.style.display = '';
+    }
+    if (cancelBtn) {
+      cancelBtn.textContent = 'Schließen';
+      cancelBtn.style.display = appMode === 'kids' ? 'none' : '';
+    }
+    document.getElementById('termin-modal-body').innerHTML = renderTerminViewBody(pendingTermin);
+    attachTerminViewHandlers();
+    return;
+  }
+
+  // EDIT-Modus
+  titleEl.textContent = isExisting ? 'Termin bearbeiten' : 'Termin hinzufügen';
+  deleteBtn.style.visibility = isExisting ? 'visible' : 'hidden';
+  if (saveBtn) { saveBtn.textContent = 'Speichern'; saveBtn.dataset.action = 'save'; saveBtn.style.display = ''; }
+  if (cancelBtn) { cancelBtn.textContent = 'Abbrechen'; cancelBtn.style.display = ''; }
 
   const body = document.getElementById('termin-modal-body');
   body.innerHTML =
@@ -2709,12 +2931,6 @@ function openTerminModal(id) {
       '</div></div>' +
     '<div class="form-row"><label for="t-notizen">Notizen</label>' +
       '<textarea id="t-notizen" placeholder="Fokus, Ergebnis, Bemerkungen …">' + esc(pendingTermin.notizen) + '</textarea></div>' +
-    (editingTerminId
-      ? '<div class="termin-actions-row">' +
-          '<button type="button" class="termin-action-btn" id="t-share"><span class="icon">📤</span> Teilen</button>' +
-          '<button type="button" class="termin-action-btn" id="t-ics"><span class="icon">📅</span> In Kalender</button>' +
-        '</div>'
-      : '') +
     renderAnwesenheitInModal(pendingTermin);
 
   function updateConditional() {
@@ -2726,7 +2942,57 @@ function openTerminModal(id) {
   document.getElementById('t-typ').onchange = updateConditional;
 
   attachAwHandlers(body);
+  setTimeout(() => { const el = document.getElementById('t-titel'); if (el) el.focus(); }, 50);
+}
 
+function renderTerminViewBody(termin) {
+  const d = parseISODate(termin.datum);
+  const day = d ? d.getDate() : '?';
+  const month = d ? MONATE_KURZ[d.getMonth()] : '';
+  const weekday = d ? ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()] : '';
+  const time = termin.uhrzeit_start + (termin.uhrzeit_ende ? ' – ' + termin.uhrzeit_ende : '');
+  const ortLabel = termin.typ === 'spiel'
+    ? (termin.heimspiel ? 'Heim' : 'Auswärts') + (termin.ort ? ' · ' + termin.ort : '')
+    : termin.ort;
+
+  const counts = { zugesagt: 0, fraglich: 0, abgesagt: 0, unbekannt: 0 };
+  (termin.anwesenheit || []).forEach(a => { if (counts[a.status] != null) counts[a.status]++; });
+
+  let html = '<div class="termin-view-summary">' +
+    '<div class="termin-view-head">' +
+      '<div class="termin-view-date">' +
+        '<span class="termin-view-date-d">' + day + '</span>' +
+        '<span class="termin-view-date-m">' + esc(month) + '</span>' +
+      '</div>' +
+      '<div style="flex:1; min-width:0;">' +
+        '<p class="termin-view-title">' +
+          '<span class="termin-typ-badge termin-typ-' + esc(termin.typ) + '">' + esc(TYP_LABEL[termin.typ] || termin.typ) + '</span>' +
+          esc(termin.titel || '(ohne Titel)') +
+        '</p>' +
+        '<div class="termin-view-subtitle">' + esc(weekday) + (weekday ? ', ' : '') + esc(formatDateDE(termin.datum)) + ' · ' + esc(time) + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="termin-view-rows">' +
+      (ortLabel ? '<div class="termin-view-row"><span class="termin-view-row-label">Ort</span><span class="termin-view-row-val">' + esc(ortLabel) + '</span></div>' : '') +
+      (termin.typ === 'spiel' && termin.gegner ? '<div class="termin-view-row"><span class="termin-view-row-label">Gegner</span><span class="termin-view-row-val">' + esc(termin.gegner) + '</span></div>' : '') +
+      (termin.notizen ? '<div class="termin-view-row"><span class="termin-view-row-label">Notizen</span><span class="termin-view-row-val">' + esc(termin.notizen) + '</span></div>' : '') +
+    '</div>' +
+  '</div>';
+
+  if (appMode !== 'kids') {
+    html += '<div class="termin-actions-row">' +
+      '<button type="button" class="termin-action-btn" id="t-share"><span class="icon">📤</span> Teilen</button>' +
+      '<button type="button" class="termin-action-btn" id="t-ics"><span class="icon">📅</span> In Kalender</button>' +
+    '</div>';
+  }
+
+  // Anwesenheit immer anzeigen, im View-Modus aber als Übersicht (nicht editierbar)
+  html += renderAnwesenheitInModal(termin);
+
+  return html;
+}
+
+function attachTerminViewHandlers() {
   const shareBtn = document.getElementById('t-share');
   if (shareBtn) shareBtn.onclick = () => {
     if (!editingTerminId) return;
@@ -2737,11 +3003,11 @@ function openTerminModal(id) {
   if (icsBtn) icsBtn.onclick = () => {
     if (!editingTerminId) return;
     const orig = db.termine.find(t => t.id === editingTerminId);
-    if (orig) downloadIcsForTermin(orig);
+    if (orig) openCalendarChoice(orig);
   };
-
-  document.getElementById('termin-modal').classList.add('open');
-  setTimeout(() => { const el = document.getElementById('t-titel'); if (el) el.focus(); }, 50);
+  // Anwesenheit im View-Modus auch klickbar lassen — schnelles Tracking
+  const body = document.getElementById('termin-modal-body');
+  if (body) attachAwHandlers(body);
 }
 
 function renderAnwesenheitInModal(termin) {
@@ -2810,6 +3076,15 @@ function attachAwHandlers(body) {
         btn.classList.add('active');
       }
       updateAwSummary();
+
+      // Im View-Modus: Änderung direkt in DB persistieren (kein Save-Button)
+      if (!terminModalEditMode && editingTerminId) {
+        const idx = db.termine.findIndex(t => t.id === editingTerminId);
+        if (idx >= 0) {
+          db.termine[idx].anwesenheit = JSON.parse(JSON.stringify(pendingTermin.anwesenheit));
+          saveDb();
+        }
+      }
     };
   });
 }
@@ -2827,6 +3102,7 @@ function closeTerminModal() {
   document.getElementById('termin-modal').classList.remove('open');
   editingTerminId = null;
   pendingTermin = null;
+  terminModalEditMode = false;
 }
 
 function saveTerminModal() {
@@ -2847,15 +3123,24 @@ function saveTerminModal() {
     return;
   }
 
-  if (editingTerminId) {
+  const wasExisting = !!editingTerminId;
+  if (wasExisting) {
     const idx = db.termine.findIndex(t => t.id === editingTerminId);
     if (idx >= 0) db.termine[idx] = pendingTermin;
   } else {
     db.termine.push(pendingTermin);
+    editingTerminId = pendingTermin.id;
   }
   saveDb();
   renderTermineTab();
-  closeTerminModal();
+
+  if (wasExisting) {
+    // Zurück in View-Modus
+    terminModalEditMode = false;
+    renderTerminModal();
+  } else {
+    closeTerminModal();
+  }
 }
 
 function deleteTerminModal() {
@@ -2870,8 +3155,29 @@ function deleteTerminModal() {
 }
 
 document.getElementById('termin-modal-close').onclick = closeTerminModal;
-document.getElementById('termin-modal-cancel').onclick = closeTerminModal;
-document.getElementById('termin-modal-save').onclick = saveTerminModal;
+document.getElementById('termin-modal-cancel').onclick = () => {
+  if (terminModalEditMode && editingTerminId && appMode !== 'kids') {
+    // Im Edit-Modus einer bestehenden: zurück in View, Änderungen verwerfen
+    const orig = db.termine.find(t => t.id === editingTerminId);
+    if (orig) pendingTermin = JSON.parse(JSON.stringify(orig));
+    terminModalEditMode = false;
+    renderTerminModal();
+  } else {
+    closeTerminModal();
+  }
+};
+document.getElementById('termin-modal-save').onclick = () => {
+  const btn = document.getElementById('termin-modal-save');
+  const action = btn ? btn.dataset.action : 'save';
+  if (action === 'enter-edit') {
+    terminModalEditMode = true;
+    renderTerminModal();
+  } else if (action === 'close') {
+    closeTerminModal();
+  } else {
+    saveTerminModal();
+  }
+};
 document.getElementById('termin-modal-delete').onclick = deleteTerminModal;
 document.getElementById('termin-modal').onclick = (e) => {
   if (e.target.id === 'termin-modal') closeTerminModal();
@@ -4758,12 +5064,19 @@ document.getElementById('spieler-modal').onclick = (e) => {
 };
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (document.getElementById('spieler-modal').classList.contains('open')) closeSpielerModal();
+  if (document.getElementById('cal-choice-modal').classList.contains('open')) closeCalChoiceModal();
+  else if (document.getElementById('spieler-modal').classList.contains('open')) closeSpielerModal();
   else if (document.getElementById('termin-modal').classList.contains('open')) closeTerminModal();
   else if (document.getElementById('uebung-modal').classList.contains('open')) closeUebungModal();
   else if (document.getElementById('item-modal').classList.contains('open')) closeItemModal();
   else if (document.getElementById('picker-modal').classList.contains('open')) closePickerModal();
 });
+
+document.getElementById('cal-choice-close').onclick = closeCalChoiceModal;
+document.getElementById('cal-choice-cancel').onclick = closeCalChoiceModal;
+document.getElementById('cal-choice-modal').onclick = (e) => {
+  if (e.target.id === 'cal-choice-modal') closeCalChoiceModal();
+};
 
 const exportBtn = document.getElementById('export-btn');
 if (exportBtn) exportBtn.onclick = () => {
