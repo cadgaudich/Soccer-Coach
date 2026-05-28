@@ -1025,6 +1025,231 @@ tr:hover .row-actions { opacity: 1; }
 .sz-pitch.animating { cursor: pointer; }
 .sz-pitch .sz-el, .sz-pitch .sz-pfeil { transition: none; }
 .sz-toolbar.dim { opacity: 0.4; pointer-events: none; }
+
+/* ============================================
+   MOBILE-OPTIMIERUNG (max-width: 768px)
+   ============================================ */
+@media (max-width: 768px) {
+
+  body { font-size: 15px; }
+
+  /* HEADER kompakter */
+  .app-header {
+    padding: 10px 12px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .app-header h1 { font-size: 17px; }
+  .header-team-info { font-size: 12px; }
+  .header-actions { gap: 4px; }
+  .icon-btn { width: 38px; height: 38px; font-size: 16px; }
+  .mode-pill { padding: 7px 14px; font-size: 13px; }
+
+  /* TABS als horizontale Scroll-Bar oben */
+  .tabs {
+    padding: 0 8px;
+    overflow-x: auto; overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 0;
+    flex-wrap: nowrap;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 12px 14px;
+    font-size: 14px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* MAIN content padding kleiner */
+  main { padding: 14px 12px 80px; }
+
+  /* TOOLBAR (über Listen) stack-bar mit wrap */
+  .toolbar {
+    flex-wrap: wrap; gap: 8px;
+    margin-bottom: 12px;
+  }
+  .toolbar .btn { padding: 10px 14px; font-size: 14px; min-height: 42px; }
+  .toolbar input[type="search"], .toolbar input[type="text"] {
+    flex: 1 1 100%; min-width: 0;
+    padding: 10px 12px; font-size: 15px;
+  }
+
+  /* BUTTONS allgemein größer für Touch */
+  .btn {
+    padding: 10px 16px; font-size: 14px;
+    min-height: 42px;
+  }
+  .filter-pill { padding: 9px 14px; font-size: 13px; }
+  .filter-pills { flex-wrap: wrap; }
+
+  /* STATS-Karten kleiner */
+  .stats { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; }
+  .stat { padding: 10px 12px; }
+  .stat-value { font-size: 22px; }
+  .stat-label { font-size: 11px; }
+
+  /* FORM-Inputs touch-optimiert */
+  .form-row {
+    grid-template-columns: 1fr; gap: 6px;
+    margin-bottom: 14px;
+  }
+  .form-row label {
+    font-size: 12px; color: var(--text-2);
+    font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+  input[type="text"], input[type="number"], input[type="search"],
+  input[type="date"], input[type="time"], input[type="email"],
+  select, textarea {
+    width: 100%; box-sizing: border-box;
+    padding: 12px 14px !important;
+    font-size: 16px !important; /* verhindert iOS-Auto-Zoom */
+  }
+  textarea { min-height: 100px; }
+
+  /* MODALS als Full-Screen-Sheets von unten */
+  .modal-overlay { align-items: flex-end; padding: 0; }
+  .modal {
+    width: 100%; max-width: 100%;
+    max-height: 92vh;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin: 0;
+  }
+  .modal-header { padding: 14px 16px; position: sticky; top: 0; background: var(--surface); z-index: 5; border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 17px; }
+  .modal-body { padding: 14px 16px; }
+  .modal-footer {
+    padding: 12px 16px;
+    position: sticky; bottom: 0; background: var(--surface);
+    flex-wrap: wrap; gap: 8px; border-top: 1px solid var(--border);
+  }
+  .modal-footer-right { width: 100%; justify-content: stretch; gap: 8px; }
+  .modal-footer-right .btn { flex: 1; }
+  .modal-footer .btn-danger { width: 100%; order: 99; }
+
+  /* SPIELER-Liste */
+  .spieler-card { padding: 12px 14px; }
+  .spieler-num { font-size: 18px; min-width: 32px; }
+  .spieler-name { font-size: 15px; }
+
+  /* TERMINE */
+  .termin-card { padding: 12px 14px; gap: 10px; }
+  .termin-date { min-width: 48px; padding: 6px; }
+  .termin-date-d { font-size: 19px; }
+  .termin-titel { font-size: 14px; }
+  .termin-aw { font-size: 11px; }
+
+  /* ÜBUNGS-KARTEN: eine Spalte */
+  .uebung-grid { grid-template-columns: 1fr; gap: 10px; }
+  .uebung-icon-band { height: 140px; } /* mehr Platz für Bilder */
+  .uebung-name { font-size: 16px; }
+
+  /* AUFSTELLUNGEN-LISTE */
+  .aufst-list-grid { grid-template-columns: 1fr; }
+  .aufst-layout { grid-template-columns: 1fr; gap: 14px; }
+  .aufst-editor-top { gap: 6px; }
+  .aufst-editor-top input[type="text"] { width: 100%; flex: 1 1 100%; font-size: 17px; }
+  .aufst-editor-top select { flex: 1 1 calc(50% - 4px); padding: 10px; font-size: 14px; }
+  .aufst-back-btn { font-size: 14px; padding: 10px 14px; }
+  .aufst-count { font-size: 13px; padding: 8px 12px; flex: 1 1 100%; text-align: center; }
+  .kader-list { max-height: 280px; }
+  .kader-card { padding: 10px 12px; }
+  .kader-name { font-size: 14px; }
+
+  /* SPIELZÜGE-LISTE: eine Spalte */
+  .sz-list-grid { grid-template-columns: 1fr; gap: 10px; }
+  .sz-list-thumb { height: 200px; }
+  .sz-list-name { font-size: 16px; }
+
+  /* SPIELZUG-EDITOR Layout: alles untereinander */
+  .sz-layout { grid-template-columns: 1fr; gap: 12px; }
+  .sz-editor-top { gap: 6px; }
+  .sz-editor-top input[type="text"] { width: 100%; flex: 1 1 100%; font-size: 17px; }
+  .sz-editor-top select { flex: 1 1 calc(50% - 4px); padding: 10px; font-size: 14px; }
+
+  /* TOOLBAR horizontal scrollbar oben */
+  .sz-toolbar {
+    flex-direction: row !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 6px; position: static;
+  }
+  .sz-toolbar::-webkit-scrollbar { display: none; }
+  .sz-tool { width: 46px; height: 46px; font-size: 20px; flex-shrink: 0; }
+  .sz-tool-divider {
+    width: 1px; height: 30px; background: var(--border);
+    margin: 0 4px; align-self: center;
+  }
+  .sz-pitch-wrap { padding: 10px; }
+  .sz-instruction { font-size: 13px; padding: 10px 12px; flex-wrap: wrap; }
+  .sz-instruction-del { font-size: 12px; padding: 6px 12px; min-height: 34px; }
+  .sz-phase-controls, .sz-zone-controls { width: 100%; justify-content: center; margin-top: 6px; }
+  .sz-phase-controls button { padding: 6px 12px; font-size: 13px; min-width: 32px; }
+
+  .sz-current-phase, .sz-newphase-btn { font-size: 12px; padding: 8px 12px; }
+  .sz-play-btn { padding: 11px 18px; font-size: 14px; }
+
+  /* SPIELZUG-VIEWER (Kids) */
+  .sz-viewer-top { gap: 8px; }
+  .sz-viewer-name { font-size: 17px; flex: 1 1 100%; order: 1; }
+  .sz-viewer-play { width: 100%; padding: 14px 22px; font-size: 16px; justify-content: center; }
+  .sz-viewer-pitch-wrap { padding: 10px; }
+  .sz-viewer-description { padding: 14px; font-size: 14px; }
+
+  /* TRAININGSPLAN-EDITOR */
+  .tp-list-grid { grid-template-columns: 1fr; }
+  .tp-editor-top { gap: 6px; }
+  .tp-editor-top input[type="text"] { width: 100%; flex: 1 1 100%; font-size: 17px; }
+  .tp-editor-top input[type="date"] { flex: 1 1 calc(50% - 4px); }
+  .tp-phase-head { padding: 12px 14px; }
+  .tp-phase-name { font-size: 15px; }
+  .tp-phase-body { padding: 8px 6px; }
+  .tp-item { padding: 11px 10px; gap: 8px; flex-wrap: wrap; }
+  .tp-item-body { flex: 1 1 calc(100% - 100px); min-width: 0; }
+  .tp-item-name { font-size: 14px; }
+  .tp-item-dauer { font-size: 13px; padding: 5px 10px; min-width: 56px; }
+  .tp-item-actions { gap: 4px; }
+  .tp-item-actions .icon-btn { width: 36px; height: 36px; font-size: 14px; }
+
+  /* PICKER-MODAL */
+  .picker-row { padding: 12px 12px; gap: 10px; }
+  .picker-row-name { font-size: 14px; }
+
+  /* ANWESENHEIT in Termin-Modal */
+  .anwesenheit-list { max-height: 320px; }
+  .aw-row { padding: 10px 10px; }
+  .aw-name { font-size: 14px; }
+  .aw-btn { width: 34px; height: 34px; font-size: 14px; }
+
+  /* ÜBUNG-VIEWER (Kids Read-Only) */
+  .u-viewer-img-grid { grid-template-columns: 1fr; }
+  .u-viewer-img { aspect-ratio: 16/10; }
+  .u-viewer-meta { font-size: 14px; gap: 12px; }
+  .u-viewer-section p { font-size: 15px; }
+
+  /* TAG-CHIPS (Materialien) etwas größer */
+  .tag-chip { font-size: 13px; padding: 6px 10px 6px 12px; }
+  .tag-chip-remove { font-size: 16px; padding: 2px 6px; }
+  .tag-input { font-size: 15px; padding: 6px; }
+}
+
+/* Sehr schmal (max-width: 380px) — z.B. iPhone SE */
+@media (max-width: 380px) {
+  main { padding: 12px 10px 80px; }
+  .tab { padding: 11px 12px; font-size: 13px; }
+  .stat { padding: 8px 10px; }
+  .stat-value { font-size: 20px; }
+}
+
+/* Safe-Area für iPhone-Notch und Home-Indikator */
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media (max-width: 768px) {
+    .app-header { padding-top: max(10px, env(safe-area-inset-top)); }
+    main { padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom))); }
+    .modal-footer { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  }
+}
 </style>
 </head>
 <body>
