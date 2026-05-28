@@ -282,6 +282,23 @@ tr:hover .row-actions { opacity: 1; }
 }
 .conditional-row.hidden { display: none; }
 
+.termin-actions-row {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin: 14px 0 4px; padding: 12px;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+}
+.termin-action-btn {
+  flex: 1 1 calc(50% - 4px);
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 11px 14px; min-height: 44px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-size: 14px; color: var(--text);
+  text-decoration: none;
+}
+.termin-action-btn:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-bg); }
+.termin-action-btn .icon { font-size: 16px; }
+
 .aufst-list-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 12px;
@@ -1268,8 +1285,6 @@ tr:hover .row-actions { opacity: 1; }
       <button class="mode-pill" data-mode="kids">Kids</button>
     </div>
     <button class="icon-btn" id="theme-toggle" title="Theme wechseln">◐</button>
-    <button class="icon-btn" id="export-btn" title="Daten als JSON exportieren">↓</button>
-    <button class="icon-btn" id="import-btn" title="JSON-Backup importieren">↑</button>
   </div>
 </header>
 
@@ -2151,6 +2166,7 @@ let editingAufstellungId = null;
 let selectedSlotIdx = null;
 let editingUebungId = null;
 let pendingUebung = null;
+let uebungModalEditMode = false;
 let uebungSearch = '';
 let uebungKatFilter = 'alle';
 let trainingsplaeneView = 'list';
@@ -2500,6 +2516,158 @@ function renderTerminCard(t) {
   '</div>';
 }
 
+function getTerminShareUrl(termin) {
+  const base = location.origin + location.pathname;
+  const sep = base.indexOf('?') >= 0 ? '&' : '?';
+  return base + sep + 'termin=' + encodeURIComponent(termin.id);
+}
+
+function getTerminShareText(termin) {
+  const team = (db.mannschaften || []).find(m => m.id === termin.mannschaft_id);
+  const teamName = team ? team.name : '';
+  const typEmoji = termin.typ === 'spiel' ? '⚽' : termin.typ === 'turnier' ? '🏆' : '🏃';
+  const typLabel = TYP_LABEL[termin.typ] || termin.typ;
+  const datumStr = formatDateDE(termin.datum);
+  const tag = (() => {
+    const d = parseISODate(termin.datum);
+    if (!d) return '';
+    return ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'][d.getDay()];
+  })();
+  const time = termin.uhrzeit_start + (termin.uhrzeit_ende ? '–' + termin.uhrzeit_ende : '');
+  const ortLabel = termin.typ === 'spiel'
+    ? (termin.heimspiel ? 'Heim' : 'Auswärts') + (termin.ort ? ' · ' + termin.ort : '')
+    : termin.ort;
+
+  let txt = typEmoji + ' ' + typLabel + (teamName ? ' (' + teamName + ')' : '') + '\n';
+  if (termin.titel) txt += termin.titel + '\n';
+  if (termin.typ === 'spiel' && termin.gegner) txt += 'Gegner: ' + termin.gegner + '\n';
+  txt += '\n📅 ' + (tag ? tag + ', ' : '') + datumStr + '\n';
+  txt += '🕐 ' + time + '\n';
+  if (ortLabel) txt += '📍 ' + ortLabel + '\n';
+  if (termin.notizen) txt += '\n' + termin.notizen + '\n';
+  txt += '\nBitte zu-/absagen.\n';
+  txt += '\nDetails: ' + getTerminShareUrl(termin);
+  return txt;
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+function toIcsDateTime(dateStr, timeStr) {
+  // Lokale Zeit ohne TZ-Marker — Kalender-Apps interpretieren als lokale Zeit
+  const d = parseISODate(dateStr);
+  if (!d) return null;
+  let h = 0, mi = 0;
+  if (timeStr && timeStr.indexOf(':') > 0) {
+    const parts = timeStr.split(':');
+    h = parseInt(parts[0], 10) || 0;
+    mi = parseInt(parts[1], 10) || 0;
+  }
+  return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) +
+         'T' + pad2(h) + pad2(mi) + '00';
+}
+
+function buildIcsForTermin(termin) {
+  const team = (db.mannschaften || []).find(m => m.id === termin.mannschaft_id);
+  const teamName = team ? team.name : '';
+  const typLabel = TYP_LABEL[termin.typ] || termin.typ;
+  const titel = (termin.titel || typLabel) +
+    (termin.typ === 'spiel' && termin.gegner ? ' vs ' + termin.gegner : '') +
+    (teamName ? ' — ' + teamName : '');
+  const dtStart = toIcsDateTime(termin.datum, termin.uhrzeit_start || '17:30');
+  const dtEnd = toIcsDateTime(termin.datum, termin.uhrzeit_ende || addHour(termin.uhrzeit_start || '17:30', 1.5));
+  if (!dtStart || !dtEnd) return null;
+
+  const ortLabel = termin.typ === 'spiel'
+    ? (termin.heimspiel ? 'Heim' : 'Auswärts') + (termin.ort ? ' (' + termin.ort + ')' : '')
+    : (termin.ort || '');
+  const desc = (termin.notizen || '').replace(/\n/g, '\\n');
+
+  const lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Coach App//DE',
+    'CALSCALE:GREGORIAN',
+    'BEGIN:VEVENT',
+    'UID:' + termin.id + '@coach.app',
+    'DTSTAMP:' + toIcsDateTime(new Date().toISOString().slice(0,10), pad2(new Date().getHours()) + ':' + pad2(new Date().getMinutes())),
+    'DTSTART:' + dtStart,
+    'DTEND:' + dtEnd,
+    'SUMMARY:' + escapeIcs(titel),
+    ortLabel ? 'LOCATION:' + escapeIcs(ortLabel) : '',
+    desc ? 'DESCRIPTION:' + escapeIcs(desc) : '',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].filter(Boolean);
+  return lines.join('\r\n');
+}
+
+function escapeIcs(str) {
+  return String(str || '')
+    .replace(/\\/g, '\\\\')
+    .replace(/;/g, '\\;')
+    .replace(/,/g, '\\,')
+    .replace(/\n/g, '\\n');
+}
+
+function addHour(timeStr, hoursToAdd) {
+  if (!timeStr || timeStr.indexOf(':') < 0) return timeStr;
+  const parts = timeStr.split(':');
+  const totalMin = (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0) + Math.round(hoursToAdd * 60);
+  const h = Math.floor(totalMin / 60) % 24;
+  const m = totalMin % 60;
+  return pad2(h) + ':' + pad2(m);
+}
+
+function downloadIcsForTermin(termin) {
+  const ics = buildIcsForTermin(termin);
+  if (!ics) { alert('Termin braucht Datum und Uhrzeit, bevor er in den Kalender kann.'); return; }
+  const slug = (termin.titel || 'Termin').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 40) || 'termin';
+  const filename = 'coach-' + termin.datum + '-' + slug + '.ics';
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function shareTermin(termin) {
+  const text = getTerminShareText(termin);
+  const url = getTerminShareUrl(termin);
+  if (navigator.share) {
+    navigator.share({
+      title: 'Termin: ' + (termin.titel || ''),
+      text: text,
+      url: url
+    }).catch((err) => {
+      if (err.name !== 'AbortError') {
+        // Fallback: in Zwischenablage
+        copyToClipboardFallback(text);
+      }
+    });
+  } else {
+    copyToClipboardFallback(text);
+  }
+}
+
+function copyToClipboardFallback(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Text in die Zwischenablage kopiert. Jetzt in WhatsApp/Mail einfügen.');
+    }).catch(() => promptFallback(text));
+  } else {
+    promptFallback(text);
+  }
+}
+
+function promptFallback(text) {
+  // Letzter Ausweg
+  prompt('Text zum Kopieren (Ctrl+C / Cmd+C):', text);
+}
+
 function openTerminModal(id) {
   editingTerminId = id || null;
   const isEdit = !!id;
@@ -2541,6 +2709,12 @@ function openTerminModal(id) {
       '</div></div>' +
     '<div class="form-row"><label for="t-notizen">Notizen</label>' +
       '<textarea id="t-notizen" placeholder="Fokus, Ergebnis, Bemerkungen …">' + esc(pendingTermin.notizen) + '</textarea></div>' +
+    (editingTerminId
+      ? '<div class="termin-actions-row">' +
+          '<button type="button" class="termin-action-btn" id="t-share"><span class="icon">📤</span> Teilen</button>' +
+          '<button type="button" class="termin-action-btn" id="t-ics"><span class="icon">📅</span> In Kalender</button>' +
+        '</div>'
+      : '') +
     renderAnwesenheitInModal(pendingTermin);
 
   function updateConditional() {
@@ -2552,6 +2726,20 @@ function openTerminModal(id) {
   document.getElementById('t-typ').onchange = updateConditional;
 
   attachAwHandlers(body);
+
+  const shareBtn = document.getElementById('t-share');
+  if (shareBtn) shareBtn.onclick = () => {
+    if (!editingTerminId) return;
+    const orig = db.termine.find(t => t.id === editingTerminId);
+    if (orig) shareTermin(orig);
+  };
+  const icsBtn = document.getElementById('t-ics');
+  if (icsBtn) icsBtn.onclick = () => {
+    if (!editingTerminId) return;
+    const orig = db.termine.find(t => t.id === editingTerminId);
+    if (orig) downloadIcsForTermin(orig);
+  };
+
   document.getElementById('termin-modal').classList.add('open');
   setTimeout(() => { const el = document.getElementById('t-titel'); if (el) el.focus(); }, 50);
 }
@@ -3155,8 +3343,8 @@ function renderUebungReadonlyBody(u) {
 
 function openUebungModal(id) {
   editingUebungId = id || null;
-  const isEdit = !!id;
-  if (isEdit) {
+  const isExisting = !!id;
+  if (isExisting) {
     const orig = db.uebungen.find(u => u.id === id);
     if (!orig) return;
     pendingUebung = JSON.parse(JSON.stringify(orig));
@@ -3164,16 +3352,43 @@ function openUebungModal(id) {
     pendingUebung = mkUebung({});
   }
 
+  // Neue Übung: direkt im Edit-Modus, Kids-Mode: immer View
+  // Bestehende Übung: standardmäßig im View-Modus, "Bearbeiten" schaltet um
+  uebungModalEditMode = !isExisting && appMode !== 'kids';
+  renderUebungModal();
+  document.getElementById('uebung-modal').classList.add('open');
+}
+
+function renderUebungModal() {
+  if (!pendingUebung) return;
+  const isExisting = !!editingUebungId;
+  const titleEl = document.getElementById('uebung-modal-title');
+  const deleteBtn = document.getElementById('uebung-modal-delete');
+  const saveBtn = document.getElementById('uebung-modal-save');
+  const cancelBtn = document.getElementById('uebung-modal-cancel');
+
   if (appMode === 'kids') {
-    document.getElementById('uebung-modal-title').textContent = pendingUebung.name || 'Übung';
-    document.getElementById('uebung-modal-delete').style.visibility = 'hidden';
+    titleEl.textContent = pendingUebung.name || 'Übung';
+    deleteBtn.style.visibility = 'hidden';
     document.getElementById('uebung-modal-body').innerHTML = renderUebungReadonlyBody(pendingUebung);
-    document.getElementById('uebung-modal').classList.add('open');
     return;
   }
 
-  document.getElementById('uebung-modal-title').textContent = isEdit ? 'Übung bearbeiten' : 'Übung hinzufügen';
-  document.getElementById('uebung-modal-delete').style.visibility = isEdit ? 'visible' : 'hidden';
+  if (!uebungModalEditMode && isExisting) {
+    // VIEW-Modus für bestehende Übung
+    titleEl.textContent = pendingUebung.name || 'Übung';
+    deleteBtn.style.visibility = 'visible';
+    if (saveBtn) { saveBtn.textContent = '✎ Bearbeiten'; saveBtn.dataset.action = 'enter-edit'; }
+    if (cancelBtn) cancelBtn.textContent = 'Schließen';
+    document.getElementById('uebung-modal-body').innerHTML = renderUebungReadonlyBody(pendingUebung);
+    return;
+  }
+
+  // EDIT-Modus (neue Übung oder explizit aktiviert)
+  titleEl.textContent = isExisting ? 'Übung bearbeiten' : 'Übung hinzufügen';
+  deleteBtn.style.visibility = isExisting ? 'visible' : 'hidden';
+  if (saveBtn) { saveBtn.textContent = 'Speichern'; saveBtn.dataset.action = 'save'; }
+  if (cancelBtn) cancelBtn.textContent = 'Abbrechen';
 
   const body = document.getElementById('uebung-modal-body');
   body.innerHTML =
@@ -3204,8 +3419,7 @@ function openUebungModal(id) {
 
   attachTagInputHandlers();
   attachUebungImageHandlers();
-  document.getElementById('uebung-modal').classList.add('open');
-  setTimeout(() => document.getElementById('u-name').focus(), 50);
+  setTimeout(() => { const el = document.getElementById('u-name'); if (el) el.focus(); }, 50);
 }
 
 function renderTagChip(text, idx) {
@@ -3256,6 +3470,7 @@ function closeUebungModal() {
   document.getElementById('uebung-modal').classList.remove('open');
   editingUebungId = null;
   pendingUebung = null;
+  uebungModalEditMode = false;
 }
 
 function saveUebungModal() {
@@ -3279,15 +3494,25 @@ function saveUebungModal() {
     return;
   }
 
-  if (editingUebungId) {
+  const wasExisting = !!editingUebungId;
+  if (wasExisting) {
     const idx = db.uebungen.findIndex(u => u.id === editingUebungId);
     if (idx >= 0) db.uebungen[idx] = pendingUebung;
   } else {
     db.uebungen.push(pendingUebung);
+    editingUebungId = pendingUebung.id;
   }
   saveDb();
   renderUebungenTab();
-  closeUebungModal();
+
+  if (wasExisting) {
+    // Zurück in View-Modus, damit der User das gespeicherte Ergebnis sieht
+    uebungModalEditMode = false;
+    renderUebungModal();
+  } else {
+    // Neue Übung: Modal schließen
+    closeUebungModal();
+  }
 }
 
 function deleteUebungModal() {
@@ -4499,8 +4724,26 @@ document.getElementById('item-modal').onclick = (e) => {
 };
 
 document.getElementById('uebung-modal-close').onclick = closeUebungModal;
-document.getElementById('uebung-modal-cancel').onclick = closeUebungModal;
-document.getElementById('uebung-modal-save').onclick = saveUebungModal;
+document.getElementById('uebung-modal-cancel').onclick = () => {
+  if (uebungModalEditMode && editingUebungId && appMode !== 'kids') {
+    // Bestehende Übung: zurück in View-Modus, Änderungen verwerfen (pendingUebung neu laden)
+    const orig = db.uebungen.find(u => u.id === editingUebungId);
+    if (orig) pendingUebung = JSON.parse(JSON.stringify(orig));
+    uebungModalEditMode = false;
+    renderUebungModal();
+  } else {
+    closeUebungModal();
+  }
+};
+document.getElementById('uebung-modal-save').onclick = () => {
+  const btn = document.getElementById('uebung-modal-save');
+  if (btn && btn.dataset.action === 'enter-edit') {
+    uebungModalEditMode = true;
+    renderUebungModal();
+  } else {
+    saveUebungModal();
+  }
+};
 document.getElementById('uebung-modal-delete').onclick = deleteUebungModal;
 document.getElementById('uebung-modal').onclick = (e) => {
   if (e.target.id === 'uebung-modal') closeUebungModal();
@@ -4522,7 +4765,8 @@ document.addEventListener('keydown', (e) => {
   else if (document.getElementById('picker-modal').classList.contains('open')) closePickerModal();
 });
 
-document.getElementById('export-btn').onclick = () => {
+const exportBtn = document.getElementById('export-btn');
+if (exportBtn) exportBtn.onclick = () => {
   const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -4532,7 +4776,8 @@ document.getElementById('export-btn').onclick = () => {
   URL.revokeObjectURL(url);
 };
 
-document.getElementById('import-btn').onclick = () => {
+const importBtn = document.getElementById('import-btn');
+if (importBtn) importBtn.onclick = () => {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = 'application/json,.json';
@@ -4589,6 +4834,29 @@ if (appMode === 'kids') {
 
 renderActiveTeam();
 renderSpielerTab();
+
+// Deep-Link: ?termin=ID → öffnet beim Start direkt den Termin
+(function handleDeepLink() {
+  try {
+    const params = new URLSearchParams(location.search);
+    const terminId = params.get('termin');
+    if (!terminId) return;
+    const termin = (db.termine || []).find(t => t.id === terminId);
+    if (!termin) {
+      // Termin nicht in lokaler DB — möglicherweise erstmaliger Empfänger ohne die Daten
+      setTimeout(() => {
+        alert('Dieser Termin liegt nicht in deinen Daten.\n\nDas ist normal, wenn dir der Link geschickt wurde — der Coach hat die Termine in seiner App. Bitte beim Coach (z.B. via WhatsApp) zu/absagen.');
+      }, 400);
+      return;
+    }
+    // Termine-Tab aktivieren
+    const terminTab = document.querySelector('.tab[data-tab="termine"]');
+    if (terminTab) terminTab.click();
+    setTimeout(() => openTerminModal(terminId), 200);
+  } catch (err) {
+    console.warn('[Coach] Deep-Link fehlgeschlagen:', err);
+  }
+})();
 
 // PWA: Service-Worker registrieren (nur unter https:// oder localhost — file:// wird übersprungen)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
