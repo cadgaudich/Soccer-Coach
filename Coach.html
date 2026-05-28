@@ -1,0 +1,4380 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Coach · Jugendtraining</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#639922">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Coach">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+:root {
+  --bg: #f7f7f4;
+  --surface: #ffffff;
+  --surface-2: #f1efe8;
+  --border: rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.16);
+  --text: #2c2c2a;
+  --text-2: #5f5e5a;
+  --text-3: #888780;
+  --accent: #639922;
+  --accent-bg: #eaf3de;
+  --accent-text: #27500a;
+  --warn-bg: #FAEEDA;
+  --warn-text: #633806;
+  --danger: #E24B4A;
+  --danger-bg: #FCEBEB;
+  --danger-text: #791F1F;
+  --info-bg: #E6F1FB;
+  --info-text: #0C447C;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --shadow-modal: 0 12px 40px rgba(0,0,0,0.18);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+[data-theme="dark"] {
+  --bg: #1a1a18;
+  --surface: #242422;
+  --surface-2: #2d2d2a;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.18);
+  --text: #e8e6df;
+  --text-2: #b4b2a9;
+  --text-3: #888780;
+  --accent-bg: rgba(99,153,34,0.20);
+  --accent-text: #97C459;
+  --warn-bg: rgba(186,117,23,0.20);
+  --warn-text: #FAC775;
+  --danger-bg: rgba(226,75,74,0.18);
+  --danger-text: #F09595;
+  --info-bg: rgba(24,95,165,0.20);
+  --info-text: #85B7EB;
+  --shadow-modal: 0 12px 40px rgba(0,0,0,0.55);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: var(--font); font-size: 14px; color: var(--text); background: var(--bg); line-height: 1.5; }
+
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 24px; background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-logo {
+  width: 30px; height: 30px; border-radius: var(--radius);
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 14px; letter-spacing: 0.5px;
+}
+.brand-name { font-weight: 600; font-size: 15px; }
+.brand-team { font-size: 12px; color: var(--text-2); padding-left: 14px; border-left: 1px solid var(--border); }
+.header-actions { display: flex; gap: 6px; align-items: center; }
+.icon-btn {
+  width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-2);
+  cursor: pointer; font-size: 14px; font-family: inherit; line-height: 1;
+}
+.icon-btn:hover { background: var(--surface-2); color: var(--text); border-color: var(--border-strong); }
+
+.tab-nav { display: flex; gap: 2px; padding: 6px 24px; background: var(--surface); border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab {
+  padding: 8px 14px; font-size: 13px; color: var(--text-2);
+  background: transparent; border: none; border-radius: var(--radius-sm);
+  cursor: pointer; font-family: inherit; white-space: nowrap;
+}
+.tab:hover { background: var(--surface-2); color: var(--text); }
+.tab.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+
+.stats { display: flex; gap: 12px; margin-bottom: 16px; }
+.stat { padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); flex: 1; }
+.stat-label { font-size: 11px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 22px; font-weight: 600; margin-top: 4px; line-height: 1.1; }
+
+.toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.search {
+  flex: 1; min-width: 200px; padding: 8px 12px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); font-family: inherit; font-size: 13px; color: var(--text);
+}
+.search:focus { outline: none; border-color: var(--accent); }
+
+.btn {
+  padding: 8px 14px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: inherit; font-size: 13px; cursor: pointer;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--border-strong); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: white; }
+.btn-primary:hover { background: #527d1c; border-color: #527d1c; color: white; }
+.btn-danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger-bg); }
+
+table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden;
+}
+th {
+  text-align: left; padding: 10px 14px;
+  font-size: 11px; color: var(--text-2);
+  text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500;
+  background: var(--surface-2); border-bottom: 1px solid var(--border);
+}
+td { padding: 11px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+tr:last-child td { border-bottom: none; }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--surface-2); }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px;
+  font-size: 11px; font-weight: 500;
+}
+.badge-fit { background: var(--accent-bg); color: var(--accent-text); }
+.badge-fraglich { background: var(--warn-bg); color: var(--warn-text); }
+.badge-krank, .badge-verletzt { background: var(--danger-bg); color: var(--danger-text); }
+.badge-cap { background: var(--warn-bg); color: var(--warn-text); margin-left: 6px; }
+
+.pos-pill {
+  display: inline-block; padding: 2px 7px;
+  background: var(--info-bg); color: var(--info-text);
+  border-radius: var(--radius-sm); font-size: 11px; font-weight: 500;
+}
+
+.row-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.1s; justify-content: flex-end; }
+tr:hover .row-actions { opacity: 1; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+  display: none; align-items: center; justify-content: center;
+  z-index: 100; padding: 24px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface); border-radius: var(--radius-lg);
+  width: 100%; max-width: 540px; max-height: calc(100vh - 48px);
+  display: flex; flex-direction: column; box-shadow: var(--shadow-modal);
+}
+.modal-header {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.modal-title { font-size: 16px; font-weight: 600; margin: 0; }
+.modal-body { padding: 18px 20px; overflow-y: auto; }
+.modal-footer {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; gap: 8px;
+}
+.modal-footer-right { display: flex; gap: 8px; }
+
+.form-row {
+  display: grid; grid-template-columns: 140px 1fr; gap: 12px;
+  align-items: center; margin-bottom: 11px;
+}
+.form-row label { font-size: 13px; color: var(--text-2); }
+.form-row input, .form-row select, .form-row textarea {
+  padding: 7px 10px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 13px; color: var(--text); width: 100%;
+}
+.form-row input:focus, .form-row select:focus, .form-row textarea:focus {
+  outline: none; border-color: var(--accent);
+}
+.form-row textarea { min-height: 60px; resize: vertical; font-family: inherit; }
+.inline-check { display: flex; align-items: center; gap: 8px; }
+.inline-check input[type="checkbox"] { width: auto; }
+.inline-check label { color: var(--text); cursor: pointer; }
+
+.empty { padding: 60px 20px; text-align: center; color: var(--text-3); }
+.empty p { margin: 8px 0; }
+
+.placeholder {
+  padding: 80px 20px; text-align: center; color: var(--text-3);
+  background: var(--surface); border: 1px dashed var(--border-strong); border-radius: var(--radius-lg);
+}
+.placeholder h3 { margin: 0 0 8px; color: var(--text-2); font-weight: 500; font-size: 16px; }
+.placeholder p { margin: 4px 0; font-size: 13px; }
+
+.app-footer {
+  text-align: center; padding: 16px;
+  font-size: 11px; color: var(--text-3);
+}
+
+.filter-pills {
+  display: flex; gap: 2px; padding: 3px;
+  background: var(--surface-2); border-radius: var(--radius);
+  width: fit-content;
+}
+.filter-pill {
+  padding: 6px 14px; font-size: 12px; color: var(--text-2);
+  background: transparent; border: none; border-radius: var(--radius-sm);
+  cursor: pointer; font-family: inherit;
+}
+.filter-pill:hover { color: var(--text); }
+.filter-pill.active { background: var(--surface); color: var(--text); font-weight: 500; }
+
+.termin-list { display: flex; flex-direction: column; gap: 8px; }
+.termin-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+}
+.termin-card:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.termin-card.past { opacity: 0.7; }
+.termin-date {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: 52px; padding: 6px 8px;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+}
+.termin-card.past .termin-date { background: transparent; border: 1px solid var(--border); }
+.termin-date-d { font-size: 18px; font-weight: 600; line-height: 1; }
+.termin-date-m { font-size: 10px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+.termin-body { flex: 1; min-width: 0; }
+.termin-titel { font-size: 14px; font-weight: 500; margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.termin-meta { font-size: 12px; color: var(--text-2); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+.termin-typ-badge { font-size: 10px; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 500; letter-spacing: 0.3px; }
+.termin-typ-training { background: var(--info-bg); color: var(--info-text); }
+.termin-typ-spiel { background: var(--accent-bg); color: var(--accent-text); }
+.termin-typ-turnier { background: var(--warn-bg); color: var(--warn-text); }
+.termin-aw { font-size: 12px; color: var(--text-2); white-space: nowrap; text-align: right; }
+.termin-aw strong { color: var(--text); font-weight: 600; }
+
+.anwesenheit-section { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border); }
+.anwesenheit-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; gap: 8px; flex-wrap: wrap; }
+.anwesenheit-title { font-size: 13px; font-weight: 500; margin: 0; color: var(--text); }
+.anwesenheit-summary { font-size: 11px; color: var(--text-2); }
+.anwesenheit-list { display: flex; flex-direction: column; gap: 3px; max-height: 280px; overflow-y: auto; padding-right: 2px; }
+.aw-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 8px; background: var(--surface-2);
+  border-radius: var(--radius-sm);
+}
+.aw-num { width: 22px; text-align: center; font-size: 11px; font-weight: 500; color: var(--text-2); }
+.aw-name { flex: 1; font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aw-pos { font-size: 10px; color: var(--text-3); }
+.aw-buttons { display: flex; gap: 2px; }
+.aw-btn {
+  width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-size: 12px; color: var(--text-2); padding: 0; line-height: 1;
+}
+.aw-btn:hover { background: var(--bg); }
+.aw-btn.active.aw-zu { background: var(--accent); border-color: var(--accent); color: white; }
+.aw-btn.active.aw-fr { background: #BA7517; border-color: #BA7517; color: white; }
+.aw-btn.active.aw-ab { background: var(--danger); border-color: var(--danger); color: white; }
+
+.conditional-row {
+  display: grid; grid-template-columns: 140px 1fr; gap: 12px;
+  align-items: center; margin-bottom: 11px;
+}
+.conditional-row.hidden { display: none; }
+
+.aufst-list-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.aufst-list-card {
+  padding: 14px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  cursor: pointer; display: flex; flex-direction: column; gap: 8px;
+}
+.aufst-list-card:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.aufst-list-card-name { font-size: 15px; font-weight: 500; margin: 0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.aufst-list-card-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+.aufst-form-badge { font-size: 11px; padding: 2px 7px; background: var(--accent-bg); color: var(--accent-text); border-radius: var(--radius-sm); font-weight: 500; }
+.aufst-var-badge { font-size: 11px; padding: 2px 7px; background: var(--surface-2); color: var(--text-2); border-radius: var(--radius-sm); }
+.aufst-list-card-info { font-size: 12px; color: var(--text-2); }
+
+.aufst-editor-top {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.aufst-back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: transparent; border: 1px solid var(--border);
+  padding: 6px 12px; border-radius: var(--radius-sm);
+  cursor: pointer; color: var(--text-2); font-family: inherit; font-size: 13px;
+}
+.aufst-back-btn:hover { border-color: var(--border-strong); color: var(--text); background: var(--surface-2); }
+.aufst-editor-top input[type="text"] {
+  font-size: 16px; font-weight: 500; padding: 7px 10px;
+  background: transparent; border: 1px solid transparent;
+  width: 240px; color: var(--text); border-radius: var(--radius-sm);
+  font-family: inherit;
+}
+.aufst-editor-top input[type="text"]:hover { border-color: var(--border); }
+.aufst-editor-top input[type="text"]:focus {
+  border-color: var(--accent); background: var(--surface-2); outline: none;
+}
+.aufst-editor-top select {
+  padding: 7px 10px; font-size: 13px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+}
+.aufst-spacer { flex: 1; }
+.aufst-count {
+  font-size: 13px; color: var(--text-2);
+  padding: 6px 12px; background: var(--surface-2);
+  border-radius: var(--radius-sm);
+}
+.aufst-count strong { color: var(--accent-text); font-weight: 600; }
+
+.aufst-layout {
+  display: grid; grid-template-columns: 1fr 280px; gap: 24px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .aufst-layout { grid-template-columns: 1fr; }
+}
+.aufst-pitch-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.aufst-instruction {
+  font-size: 12px; color: var(--text-2); text-align: center;
+  padding: 6px 14px; background: var(--surface-2); border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.aufst-instruction.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+
+.pitch-svg {
+  width: 100%; max-width: 460px; height: auto; display: block;
+  border-radius: var(--radius-sm);
+}
+.pitch-slot { cursor: pointer; }
+.pitch-slot circle {
+  fill: rgba(255,255,255,0.94);
+  stroke: rgba(0,0,0,0.25);
+  stroke-width: 0.3;
+  transition: fill 0.12s, r 0.12s;
+}
+.pitch-slot.empty circle {
+  fill: rgba(255,255,255,0.12);
+  stroke: rgba(255,255,255,0.55);
+  stroke-dasharray: 0.8 0.8;
+}
+.pitch-slot.selected circle {
+  fill: var(--accent);
+  stroke: white;
+  stroke-width: 0.8;
+}
+.pitch-slot:hover circle { fill: white; }
+.pitch-slot.selected:hover circle { fill: var(--accent); }
+.pitch-slot .slot-num {
+  font-size: 5.5px; font-weight: 700;
+  text-anchor: middle; dominant-baseline: central;
+  fill: #2a2a2a; pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.pitch-slot.selected .slot-num { fill: white; }
+.pitch-slot .slot-plus {
+  font-size: 7px; font-weight: 300;
+  text-anchor: middle; dominant-baseline: central;
+  fill: rgba(255,255,255,0.85); pointer-events: none;
+}
+.pitch-slot .slot-label {
+  font-size: 2.8px; text-anchor: middle;
+  fill: rgba(255,255,255,0.95); pointer-events: none;
+  font-weight: 500; letter-spacing: 0.3px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.aufst-sidebar {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 12px;
+}
+.aufst-sidebar-h { font-size: 13px; font-weight: 500; margin: 0 0 10px; color: var(--text); }
+.kader-list { display: flex; flex-direction: column; gap: 4px; max-height: 500px; overflow-y: auto; padding-right: 2px; }
+.kader-card {
+  display: flex; align-items: center; gap: 8px; padding: 7px 9px;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+  cursor: pointer; border: 1px solid transparent;
+  transition: background 0.12s, border-color 0.12s;
+}
+.kader-card:hover { background: var(--bg); border-color: var(--border-strong); }
+.kader-card.placed { opacity: 0.55; }
+.kader-card.placed:hover { opacity: 0.85; }
+.kader-num { width: 22px; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-2); flex-shrink: 0; }
+.kader-name { flex: 1; font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kader-pos { font-size: 10px; color: var(--text-3); flex-shrink: 0; }
+.kader-slot-badge {
+  font-size: 9px; padding: 2px 6px;
+  background: var(--accent); color: white;
+  border-radius: 3px; font-weight: 600; letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.uebung-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.uebung-card {
+  display: flex; flex-direction: column;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.12s, transform 0.12s;
+}
+.uebung-card:hover { border-color: var(--border-strong); }
+.uebung-icon-band {
+  height: 70px; display: flex; align-items: center; justify-content: center;
+  background: var(--surface-2); position: relative;
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+.uebung-icon-band-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.uebung-icon { font-size: 32px; line-height: 1; filter: saturate(0.85); position: relative; z-index: 1; }
+.uebung-kat-badge {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 10px; padding: 2px 7px; border-radius: var(--radius-sm);
+  font-weight: 500; letter-spacing: 0.3px; z-index: 2;
+  backdrop-filter: blur(4px);
+}
+.uebung-kat-aufwaermen { background: var(--info-bg); color: var(--info-text); }
+.uebung-kat-technik { background: var(--accent-bg); color: var(--accent-text); }
+.uebung-kat-spielform { background: var(--warn-bg); color: var(--warn-text); }
+.uebung-kat-abschluss { background: rgba(189, 76, 145, 0.18); color: #8a2e6a; }
+[data-theme="dark"] .uebung-kat-abschluss { background: rgba(189, 76, 145, 0.22); color: #e09bc6; }
+.uebung-kat-konditionell { background: rgba(91, 105, 170, 0.18); color: #3a4994; }
+[data-theme="dark"] .uebung-kat-konditionell { background: rgba(91, 105, 170, 0.25); color: #adb6e0; }
+.uebung-kat-raumdeckung { background: rgba(110, 70, 160, 0.18); color: #5a3d99; }
+.uebung-kat-manndeckung { background: rgba(180, 70, 100, 0.18); color: #913457; }
+.uebung-kat-viererkette { background: rgba(60, 110, 130, 0.18); color: #2a4f60; }
+.uebung-kat-dreierkette { background: rgba(140, 100, 50, 0.18); color: #6d4520; }
+[data-theme="dark"] .uebung-kat-raumdeckung { background: rgba(140, 100, 200, 0.22); color: #c4a4f0; }
+[data-theme="dark"] .uebung-kat-manndeckung { background: rgba(200, 100, 130, 0.22); color: #f0a4c0; }
+[data-theme="dark"] .uebung-kat-viererkette { background: rgba(90, 140, 170, 0.22); color: #a4c8e0; }
+[data-theme="dark"] .uebung-kat-dreierkette { background: rgba(170, 130, 80, 0.22); color: #e0c490; }
+
+.uebung-body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.uebung-name { font-size: 14px; font-weight: 500; margin: 0; color: var(--text); }
+.uebung-meta { display: flex; gap: 10px; font-size: 11px; color: var(--text-2); flex-wrap: wrap; }
+.uebung-meta-item { display: inline-flex; align-items: center; gap: 3px; }
+.uebung-beschreibung {
+  font-size: 12px; color: var(--text-2); line-height: 1.45;
+  margin: 4px 0 0; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.tag-input-wrap { display: flex; flex-wrap: wrap; gap: 5px; align-items: center;
+  padding: 4px 6px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  min-height: 30px;
+}
+.tag-input-wrap:focus-within { border-color: var(--accent); }
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 4px 2px 8px; font-size: 12px;
+  background: var(--accent-bg); color: var(--accent-text);
+  border-radius: var(--radius-sm); font-weight: 500;
+}
+.tag-chip-remove {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--accent-text); padding: 0 4px; font-size: 14px;
+  line-height: 1; opacity: 0.7;
+}
+.tag-chip-remove:hover { opacity: 1; }
+.tag-input {
+  flex: 1; min-width: 100px; border: none; background: transparent;
+  font-family: inherit; font-size: 13px; padding: 4px; color: var(--text);
+}
+.tag-input:focus { outline: none; }
+
+.range-row {
+  display: grid; grid-template-columns: 140px 1fr; gap: 12px;
+  align-items: center; margin-bottom: 11px;
+}
+.range-inputs { display: flex; gap: 8px; align-items: center; }
+.range-inputs input[type="number"] { width: 70px; }
+.range-inputs span { color: var(--text-2); font-size: 12px; }
+
+.u-img-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+  padding: 4px;
+}
+.u-img-thumb {
+  position: relative; aspect-ratio: 4/3;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+  overflow: hidden; border: 1px solid var(--border);
+}
+.u-img-thumb img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+}
+.u-img-thumb-full { grid-column: 1 / -1; aspect-ratio: 16/9; }
+.u-img-remove {
+  position: absolute; top: 6px; right: 6px;
+  width: 26px; height: 26px;
+  background: rgba(0,0,0,0.6); color: white;
+  border: none; border-radius: 50%; cursor: pointer;
+  font-size: 16px; line-height: 1; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.u-img-remove:hover { background: var(--danger); }
+.u-img-upload {
+  display: flex; align-items: center; justify-content: center;
+  aspect-ratio: 4/3;
+  background: transparent; border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-size: 12px; color: var(--text-2);
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.u-img-upload:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-bg); }
+.u-img-upload.full { grid-column: 1 / -1; aspect-ratio: 16/4; }
+
+.mode-switch {
+  display: inline-flex; gap: 2px; padding: 3px;
+  background: var(--surface-2); border-radius: var(--radius);
+  margin-right: 8px;
+}
+.mode-pill {
+  padding: 5px 12px; font-size: 12px; font-weight: 500;
+  background: transparent; border: none; cursor: pointer;
+  color: var(--text-2); border-radius: var(--radius-sm); font-family: inherit;
+}
+.mode-pill:hover { color: var(--text); }
+.mode-pill.active { background: var(--surface); color: var(--text); }
+
+/* === KIDS-MODE: ausgeblendete UI-Elemente === */
+[data-app-mode="kids"] .tab[data-tab="spieler"],
+[data-app-mode="kids"] .tab[data-tab="aufstellungen"] { display: none; }
+[data-app-mode="kids"] #export-btn,
+[data-app-mode="kids"] #import-btn { display: none; }
+[data-app-mode="kids"] #spieler-add,
+[data-app-mode="kids"] #termin-add,
+[data-app-mode="kids"] #aufst-add,
+[data-app-mode="kids"] #uebung-add,
+[data-app-mode="kids"] #sz-add,
+[data-app-mode="kids"] #tp-add,
+[data-app-mode="kids"] #uebung-load-examples,
+[data-app-mode="kids"] #uebung-load-examples-toolbar,
+[data-app-mode="kids"] #sz-load-examples,
+[data-app-mode="kids"] #sz-load-examples-toolbar { display: none; }
+[data-app-mode="kids"] .modal-footer .btn-primary,
+[data-app-mode="kids"] .modal-footer .btn-danger { display: none; }
+[data-app-mode="kids"] #tp-delete,
+[data-app-mode="kids"] #sz-delete,
+[data-app-mode="kids"] #aufst-delete { display: none; }
+[data-app-mode="kids"] .tp-phase-add,
+[data-app-mode="kids"] .tp-item-actions { display: none; }
+[data-app-mode="kids"] .tp-editor-top input,
+[data-app-mode="kids"] .tp-editor-top select { pointer-events: none; background: transparent; border-color: transparent; }
+[data-app-mode="kids"] #tp-notizen { pointer-events: none; background: var(--surface-2); }
+[data-app-mode="kids"] .anwesenheit-list { pointer-events: none; }
+[data-app-mode="kids"] .anwesenheit-list .aw-btn { opacity: 0.7; }
+[data-app-mode="kids"] #termin-modal-body input,
+[data-app-mode="kids"] #termin-modal-body select,
+[data-app-mode="kids"] #termin-modal-body textarea { pointer-events: none; background: var(--surface-2); }
+
+/* Kids-Viewer für Spielzug */
+.sz-viewer-top {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 14px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sz-viewer-name { font-size: 20px; font-weight: 500; margin: 0; flex: 1; min-width: 0; }
+.sz-viewer-play {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 22px; font-size: 15px; font-weight: 500;
+  background: var(--accent); color: white;
+  border: 1px solid var(--accent); border-radius: var(--radius);
+  cursor: pointer; font-family: inherit;
+}
+.sz-viewer-play:hover { filter: brightness(1.08); }
+.sz-viewer-play:disabled { opacity: 0.4; cursor: not-allowed; }
+.sz-viewer-play.stop { background: var(--danger); border-color: var(--danger); }
+.sz-viewer-layout { display: grid; grid-template-columns: 1fr; gap: 18px; align-items: start; }
+.sz-viewer-pitch-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px;
+  display: flex; flex-direction: column; gap: 12px; align-items: center;
+}
+.sz-viewer-pitch { width: 100%; max-width: 560px; }
+.sz-viewer-instruction {
+  width: 100%; max-width: 560px; font-size: 13px; color: var(--text-2);
+  text-align: center; padding: 8px 14px;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+}
+.sz-viewer-instruction.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+.sz-viewer-description {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px 20px;
+  font-size: 14px; line-height: 1.6; color: var(--text);
+}
+.sz-viewer-description h3 { margin: 0 0 8px; font-size: 13px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+
+/* Kids-Viewer für Übung */
+.u-viewer-img-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.u-viewer-img {
+  width: 100%; aspect-ratio: 4/3;
+  background: var(--surface-2); border-radius: var(--radius);
+  overflow: hidden; border: 1px solid var(--border);
+}
+.u-viewer-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.u-viewer-meta { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--text-2); margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.u-viewer-meta strong { color: var(--text); }
+.u-viewer-section { margin-bottom: 14px; }
+.u-viewer-section h3 { margin: 0 0 6px; font-size: 12px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.u-viewer-section p { margin: 0; font-size: 14px; line-height: 1.55; color: var(--text); white-space: pre-wrap; }
+.u-viewer-mat-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.u-viewer-mat-chip { font-size: 12px; padding: 3px 8px; background: var(--surface-2); border-radius: var(--radius-sm); color: var(--text); }
+
+.tp-list-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+.tp-list-card {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px 16px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius); cursor: pointer;
+}
+.tp-list-card:hover { border-color: var(--border-strong); background: var(--surface-2); }
+.tp-list-card-name { font-size: 15px; font-weight: 500; margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tp-list-card-meta { font-size: 12px; color: var(--text-2); display: flex; gap: 10px; flex-wrap: wrap; }
+.tp-list-card-meta strong { color: var(--accent-text); font-weight: 600; }
+
+.tp-editor-top {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 16px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.tp-editor-top input[type="text"] {
+  font-size: 16px; font-weight: 500; padding: 7px 10px;
+  background: transparent; border: 1px solid transparent;
+  width: 240px; color: var(--text); border-radius: var(--radius-sm);
+  font-family: inherit;
+}
+.tp-editor-top input[type="text"]:hover { border-color: var(--border); }
+.tp-editor-top input[type="text"]:focus {
+  border-color: var(--accent); background: var(--surface-2); outline: none;
+}
+.tp-editor-top input[type="date"] {
+  padding: 7px 10px; font-size: 13px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+}
+.tp-editor-top .aufst-spacer { flex: 1; }
+
+.tp-phase {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); margin-bottom: 14px; overflow: hidden;
+}
+.tp-phase-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+}
+.tp-phase-name { font-size: 14px; font-weight: 600; margin: 0; flex: 1; color: var(--text); }
+.tp-phase-stats { font-size: 12px; color: var(--text-2); }
+.tp-phase-stats strong { color: var(--text); font-weight: 600; }
+.tp-phase-body { padding: 8px; }
+.tp-phase-empty {
+  text-align: center; padding: 18px 8px;
+  font-size: 12px; color: var(--text-3);
+}
+
+.tp-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; margin-bottom: 4px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+.tp-item:last-child { margin-bottom: 6px; }
+.tp-item-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.tp-item-body { flex: 1; min-width: 0; cursor: pointer; }
+.tp-item-name {
+  font-size: 13px; font-weight: 500; margin: 0; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tp-item-meta { font-size: 11px; color: var(--text-2); display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; }
+.tp-item-meta .uebung-kat-badge {
+  position: static; padding: 1px 6px; font-size: 9px;
+}
+.tp-item-notiz {
+  font-size: 11px; color: var(--text-2); font-style: italic;
+  margin-top: 3px; padding-left: 1px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.tp-item-dauer {
+  font-size: 12px; font-weight: 500; color: var(--text);
+  padding: 3px 8px; background: var(--surface-2);
+  border-radius: var(--radius-sm); flex-shrink: 0; min-width: 48px; text-align: center;
+}
+.tp-item-dauer.override { background: var(--accent-bg); color: var(--accent-text); }
+.tp-item-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.tp-item-actions .icon-btn { width: 26px; height: 26px; font-size: 13px; }
+
+.tp-phase-add {
+  width: 100%; padding: 9px 10px;
+  background: transparent; border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-size: 12px; color: var(--text-2);
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.tp-phase-add:hover { border-color: var(--accent); color: var(--accent-text); background: var(--accent-bg); }
+
+.picker-toolbar {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.picker-search {
+  flex: 1; min-width: 180px; padding: 7px 10px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text);
+}
+.picker-search:focus { outline: none; border-color: var(--accent); }
+.picker-list {
+  display: flex; flex-direction: column; gap: 5px;
+  max-height: 380px; overflow-y: auto;
+}
+.picker-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; background: var(--surface-2);
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+.picker-row:hover { background: var(--bg); border-color: var(--accent); }
+.picker-row-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
+.picker-row-body { flex: 1; min-width: 0; }
+.picker-row-name { font-size: 13px; font-weight: 500; margin: 0; color: var(--text); }
+.picker-row-meta { font-size: 11px; color: var(--text-2); display: flex; gap: 8px; flex-wrap: wrap; margin-top: 2px; align-items: center; }
+.picker-row-meta .uebung-kat-badge { position: static; padding: 1px 6px; font-size: 9px; }
+.picker-empty { padding: 30px 10px; text-align: center; font-size: 12px; color: var(--text-3); }
+
+.sz-list-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.sz-list-card {
+  display: flex; flex-direction: column; gap: 8px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); cursor: pointer; overflow: hidden;
+}
+.sz-list-card:hover { border-color: var(--border-strong); }
+.sz-list-thumb {
+  height: 140px; background: linear-gradient(180deg, #5e8c1f, #4a7117);
+  display: block; position: relative;
+}
+.sz-list-thumb svg { width: 100%; height: 100%; display: block; }
+.sz-list-body { padding: 10px 14px 14px; display: flex; flex-direction: column; gap: 6px; }
+.sz-list-name { font-size: 14px; font-weight: 500; margin: 0; color: var(--text); }
+.sz-list-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+.sz-kat-badge { font-size: 10px; padding: 2px 7px; border-radius: var(--radius-sm); font-weight: 500; letter-spacing: 0.3px; }
+.sz-kat-angriff { background: var(--accent-bg); color: var(--accent-text); }
+.sz-kat-standard { background: var(--info-bg); color: var(--info-text); }
+.sz-kat-pressing { background: var(--warn-bg); color: var(--warn-text); }
+.sz-kat-defensiv { background: var(--danger-bg); color: var(--danger-text); }
+.sz-kat-raumdeckung { background: rgba(110, 70, 160, 0.18); color: #5a3d99; }
+.sz-kat-manndeckung { background: rgba(180, 70, 100, 0.18); color: #913457; }
+.sz-kat-viererkette { background: rgba(60, 110, 130, 0.18); color: #2a4f60; }
+.sz-kat-dreierkette { background: rgba(140, 100, 50, 0.18); color: #6d4520; }
+[data-theme="dark"] .sz-kat-raumdeckung { background: rgba(140, 100, 200, 0.22); color: #c4a4f0; }
+[data-theme="dark"] .sz-kat-manndeckung { background: rgba(200, 100, 130, 0.22); color: #f0a4c0; }
+[data-theme="dark"] .sz-kat-viererkette { background: rgba(90, 140, 170, 0.22); color: #a4c8e0; }
+[data-theme="dark"] .sz-kat-dreierkette { background: rgba(170, 130, 80, 0.22); color: #e0c490; }
+
+.sz-editor-top {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 12px; padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.sz-editor-top input[type="text"] {
+  font-size: 16px; font-weight: 500; padding: 7px 10px;
+  background: transparent; border: 1px solid transparent;
+  width: 240px; color: var(--text); border-radius: var(--radius-sm);
+  font-family: inherit;
+}
+.sz-editor-top input[type="text"]:hover { border-color: var(--border); }
+.sz-editor-top input[type="text"]:focus {
+  border-color: var(--accent); background: var(--surface-2); outline: none;
+}
+.sz-editor-top select {
+  padding: 7px 10px; font-size: 13px;
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-family: inherit;
+}
+
+.sz-layout {
+  display: grid; grid-template-columns: 64px 1fr 280px; gap: 14px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .sz-layout { grid-template-columns: 1fr; }
+  .sz-toolbar { flex-direction: row !important; }
+}
+
+.sz-toolbar {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 8px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  position: sticky; top: 12px;
+}
+.sz-tool {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid transparent;
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-size: 18px; color: var(--text-2); padding: 0;
+  position: relative;
+}
+.sz-tool:hover { background: var(--surface-2); color: var(--text); }
+.sz-tool.active { background: var(--accent); color: white; border-color: var(--accent); }
+.sz-tool[disabled] { opacity: 0.35; cursor: not-allowed; }
+.sz-tool[disabled]:hover { background: transparent; }
+.sz-tool-divider { height: 1px; background: var(--border); margin: 4px 2px; }
+
+.sz-pitch-wrap {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+  display: flex; flex-direction: column; gap: 10px; align-items: center;
+}
+.sz-instruction {
+  width: 100%; font-size: 12px; color: var(--text-2); text-align: center;
+  padding: 6px 12px; background: var(--surface-2); border-radius: var(--radius-sm);
+  transition: background 0.15s, color 0.15s;
+}
+.sz-instruction.active { background: var(--accent-bg); color: var(--accent-text); font-weight: 500; }
+.sz-instruction.danger { background: var(--danger-bg); color: var(--danger-text); font-weight: 500; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.sz-instruction-del {
+  padding: 3px 10px; font-size: 11px;
+  background: var(--danger); color: white;
+  border: none; border-radius: var(--radius-sm); cursor: pointer;
+  font-family: inherit; font-weight: 500;
+}
+.sz-instruction-del:hover { opacity: 0.9; }
+
+.sz-pitch {
+  width: 100%; max-width: 460px; height: auto; display: block;
+  border-radius: var(--radius-sm); user-select: none;
+}
+.sz-pitch.tool-place { cursor: copy; }
+.sz-pitch.tool-pfeil { cursor: crosshair; }
+.sz-pitch.tool-select { cursor: default; }
+
+.sz-el { cursor: move; }
+.sz-el.selected .sz-el-bg { stroke: white; stroke-width: 0.6; }
+.sz-el.selected .sz-el-halo {
+  fill: none; stroke: var(--accent);
+  stroke-width: 0.4; stroke-dasharray: 0.8 0.8;
+}
+.sz-el-spieler { fill: #4a90e2; }
+.sz-el-gegner { fill: #e24b4a; }
+.sz-el-ball { fill: white; stroke: #1a1a18; stroke-width: 0.2; }
+.sz-el-num {
+  font-size: 4px; font-weight: 700; fill: white;
+  text-anchor: middle; dominant-baseline: central;
+  pointer-events: none; user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.sz-el-x {
+  font-size: 5px; font-weight: 700; fill: white;
+  text-anchor: middle; dominant-baseline: central;
+  pointer-events: none; user-select: none;
+}
+
+.sz-pfeil { cursor: pointer; }
+.sz-pfeil.selected line, .sz-pfeil.selected path { stroke: var(--accent) !important; stroke-width: 0.9 !important; }
+.sz-pfeil-lauf { stroke: white; stroke-width: 0.7; fill: none; }
+.sz-pfeil-pass { stroke: white; stroke-width: 0.7; fill: none; stroke-dasharray: 2 1.2; }
+.sz-pfeil-dribbel { stroke: white; stroke-width: 0.7; fill: none; }
+.sz-pfeil.foe .sz-pfeil-lauf,
+.sz-pfeil.foe .sz-pfeil-pass,
+.sz-pfeil.foe .sz-pfeil-dribbel { stroke: #ff6b5e; }
+.sz-pfeil.foe.selected .sz-pfeil-lauf,
+.sz-pfeil.foe.selected .sz-pfeil-pass,
+.sz-pfeil.foe.selected .sz-pfeil-dribbel { stroke: var(--accent) !important; }
+.sz-pfeil.foe .sz-phase-badge circle { fill: rgba(160,0,0,0.75); }
+.sz-pfeil-hit { stroke: transparent; stroke-width: 5; fill: none; pointer-events: stroke; }
+
+.sz-pfeil { transition: opacity 0.35s ease-out; }
+.sz-pfeil.anim-hidden { opacity: 0; }
+
+.sz-zone { cursor: pointer; pointer-events: all; }
+.sz-zone polygon { transition: stroke-width 0.12s; }
+.sz-zone.selected polygon { stroke: white !important; stroke-width: 0.8 !important; }
+.sz-zone-label {
+  font-size: 4px; font-weight: 600; fill: white;
+  text-anchor: middle; dominant-baseline: central;
+  pointer-events: none; user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  paint-order: stroke;
+  stroke: rgba(0,0,0,0.4); stroke-width: 0.25;
+}
+.sz-zone-drawing-point {
+  fill: white; stroke: rgba(0,0,0,0.5); stroke-width: 0.2;
+}
+.sz-zone-drawing-line {
+  stroke: rgba(255,255,255,0.7); stroke-width: 0.35; fill: none; stroke-dasharray: 1 0.8;
+}
+
+.sz-zone-controls {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12px;
+}
+.sz-zone-color-btn {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid transparent; cursor: pointer; padding: 0;
+}
+.sz-zone-color-btn.active { border-color: white; box-shadow: 0 0 0 1px rgba(0,0,0,0.3); }
+.sz-zone-color-green { background: #639922; }
+.sz-zone-color-red { background: #e24b4a; }
+.sz-zone-color-blue { background: #4a90e2; }
+.sz-zone-color-yellow { background: #e0a800; }
+.sz-zone-action-btn {
+  padding: 4px 10px; font-size: 11px; font-weight: 500;
+  background: rgba(255,255,255,0.25); color: inherit;
+  border: none; border-radius: 3px; cursor: pointer;
+  font-family: inherit;
+}
+.sz-zone-action-btn:hover { background: rgba(255,255,255,0.4); }
+.sz-zone-action-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.sz-zone-action-btn.confirm { background: var(--accent); color: white; }
+.sz-zone-action-btn.confirm:hover { filter: brightness(1.08); }
+
+.sz-zone-label-input {
+  margin-left: 8px; padding: 3px 8px; font-size: 11px;
+  background: rgba(255,255,255,0.9); color: #2c2c2a;
+  border: 1px solid rgba(255,255,255,0.5); border-radius: 3px;
+  font-family: inherit; width: 140px;
+}
+
+.sz-phase-badge circle {
+  fill: rgba(0,0,0,0.65); stroke: white; stroke-width: 0.25;
+}
+.sz-phase-badge text {
+  font-size: 3.5px; font-weight: 700; fill: white;
+  text-anchor: middle; dominant-baseline: central;
+  pointer-events: none; user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.sz-pfeil.selected .sz-phase-badge circle { fill: var(--accent); stroke: white; }
+
+.sz-phase-controls {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: var(--radius-sm);
+  font-size: 11px;
+}
+.sz-phase-controls button {
+  background: rgba(255,255,255,0.25); color: inherit;
+  border: none; padding: 2px 7px; border-radius: 3px;
+  cursor: pointer; font-family: inherit; font-size: 11px; font-weight: 600;
+}
+.sz-phase-controls button:hover { background: rgba(255,255,255,0.4); }
+.sz-phase-controls button:disabled { opacity: 0.3; cursor: not-allowed; }
+.sz-phase-controls button:disabled:hover { background: rgba(255,255,255,0.25); }
+
+.sz-current-phase {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; padding: 4px 10px;
+  background: var(--surface-2); color: var(--text-2);
+  border-radius: var(--radius-sm); border: 1px solid var(--border);
+}
+.sz-current-phase strong { color: var(--accent-text); font-weight: 600; }
+.sz-newphase-btn {
+  padding: 4px 10px; font-size: 12px;
+  background: var(--surface-2); color: var(--text-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  cursor: pointer; font-family: inherit;
+}
+.sz-newphase-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+
+.sz-sidebar {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 14px;
+}
+.sz-sidebar-h { font-size: 13px; font-weight: 500; margin: 0 0 8px; color: var(--text); }
+.sz-sidebar textarea { min-height: 80px; }
+.sz-sidebar-block { margin-bottom: 12px; }
+.sz-sidebar-block:last-child { margin-bottom: 0; }
+.sz-counts { font-size: 11px; color: var(--text-2); display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+.sz-play-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; font-size: 13px; font-weight: 500;
+  background: var(--accent); color: white;
+  border: 1px solid var(--accent); border-radius: var(--radius-sm);
+  cursor: pointer; font-family: inherit;
+}
+.sz-play-btn:hover { filter: brightness(1.08); }
+.sz-play-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.sz-play-btn:disabled:hover { filter: none; }
+.sz-play-btn.stop { background: var(--danger); border-color: var(--danger); }
+
+.sz-pitch.animating { cursor: pointer; }
+.sz-pitch .sz-el, .sz-pitch .sz-pfeil { transition: none; }
+.sz-toolbar.dim { opacity: 0.4; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="brand">
+    <div class="brand-logo">C</div>
+    <div>
+      <div class="brand-name">Coach</div>
+    </div>
+    <span class="brand-team" id="active-team-display"></span>
+  </div>
+  <div class="header-actions">
+    <div class="mode-switch">
+      <button class="mode-pill" data-mode="coach">Coach</button>
+      <button class="mode-pill" data-mode="kids">Kids</button>
+    </div>
+    <button class="icon-btn" id="theme-toggle" title="Theme wechseln">◐</button>
+    <button class="icon-btn" id="export-btn" title="Daten als JSON exportieren">↓</button>
+    <button class="icon-btn" id="import-btn" title="JSON-Backup importieren">↑</button>
+  </div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab active" data-tab="spieler">Spieler</button>
+  <button class="tab" data-tab="termine">Termine</button>
+  <button class="tab" data-tab="aufstellungen">Aufstellungen</button>
+  <button class="tab" data-tab="spielzuege">Spielzüge</button>
+  <button class="tab" data-tab="uebungen">Übungen</button>
+  <button class="tab" data-tab="trainingsplaene">Trainingspläne</button>
+</nav>
+
+<main class="container">
+  <div id="tab-spieler" class="tab-content"></div>
+  <div id="tab-termine" class="tab-content" hidden></div>
+  <div id="tab-aufstellungen" class="tab-content" hidden></div>
+  <div id="tab-spielzuege" class="tab-content" hidden></div>
+  <div id="tab-uebungen" class="tab-content" hidden></div>
+  <div id="tab-trainingsplaene" class="tab-content" hidden></div>
+</main>
+
+<footer class="app-footer">
+  Coach v0.1 · lokal gespeichert in <code>welp_coach_v1</code>
+</footer>
+
+<div class="modal-overlay" id="spieler-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">Spieler hinzufügen</h2>
+      <button class="icon-btn" id="modal-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="modal-delete" style="visibility: hidden;">Löschen</button>
+      <div class="modal-footer-right">
+        <button class="btn" id="modal-cancel">Abbrechen</button>
+        <button class="btn btn-primary" id="modal-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="termin-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="termin-modal-title">Termin hinzufügen</h2>
+      <button class="icon-btn" id="termin-modal-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="termin-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="termin-modal-delete" style="visibility: hidden;">Löschen</button>
+      <div class="modal-footer-right">
+        <button class="btn" id="termin-modal-cancel">Abbrechen</button>
+        <button class="btn btn-primary" id="termin-modal-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="uebung-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="uebung-modal-title">Übung hinzufügen</h2>
+      <button class="icon-btn" id="uebung-modal-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="uebung-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="uebung-modal-delete" style="visibility: hidden;">Löschen</button>
+      <div class="modal-footer-right">
+        <button class="btn" id="uebung-modal-cancel">Abbrechen</button>
+        <button class="btn btn-primary" id="uebung-modal-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="picker-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="picker-modal-title">Übung auswählen</h2>
+      <button class="icon-btn" id="picker-modal-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="picker-modal-body"></div>
+    <div class="modal-footer">
+      <div class="modal-footer-right">
+        <button class="btn" id="picker-modal-cancel">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="item-modal">
+  <div class="modal" style="max-width: 480px;">
+    <div class="modal-header">
+      <h2 class="modal-title" id="item-modal-title">Übung anpassen</h2>
+      <button class="icon-btn" id="item-modal-close" title="Schließen">×</button>
+    </div>
+    <div class="modal-body" id="item-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger" id="item-modal-remove">Entfernen</button>
+      <div class="modal-footer-right">
+        <button class="btn" id="item-modal-cancel">Abbrechen</button>
+        <button class="btn btn-primary" id="item-modal-save">Speichern</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'welp_coach_v1';
+const THEME_KEY = 'welp_coach_theme';
+
+const DEFAULT_DB = {
+  meta: { version: 1, active_mannschaft_id: null },
+  mannschaften: [],
+  spieler: [],
+  termine: [],
+  aufstellungen: [],
+  spielzuege: [],
+  uebungen: [],
+  trainingsplaene: [],
+  spielzug_uebung: []
+};
+
+const POSITIONEN = ['TW', 'IV', 'AV', 'DM', 'ZM', 'OM', 'ST', 'LA', 'RA'];
+const STATUS_LIST = ['fit', 'fraglich', 'krank', 'verletzt'];
+const STATUS_LABEL = { fit: 'Fit', fraglich: 'Fraglich', krank: 'Krank', verletzt: 'Verletzt' };
+
+const TYP_LIST = ['training', 'spiel', 'turnier'];
+const TYP_LABEL = { training: 'Training', spiel: 'Spiel', turnier: 'Turnier' };
+const AW_STATUS = ['zugesagt', 'fraglich', 'abgesagt', 'unbekannt'];
+const MONATE_KURZ = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+
+const FORMATIONS = {
+  '4-3-3': [
+    { x: 50, y: 92, label: 'TW' },
+    { x: 18, y: 72, label: 'AV' },
+    { x: 38, y: 75, label: 'IV' },
+    { x: 62, y: 75, label: 'IV' },
+    { x: 82, y: 72, label: 'AV' },
+    { x: 30, y: 50, label: 'ZM' },
+    { x: 50, y: 55, label: 'DM' },
+    { x: 70, y: 50, label: 'ZM' },
+    { x: 18, y: 25, label: 'LA' },
+    { x: 50, y: 18, label: 'ST' },
+    { x: 82, y: 25, label: 'RA' }
+  ],
+  '4-4-2': [
+    { x: 50, y: 92, label: 'TW' },
+    { x: 18, y: 72, label: 'AV' },
+    { x: 38, y: 75, label: 'IV' },
+    { x: 62, y: 75, label: 'IV' },
+    { x: 82, y: 72, label: 'AV' },
+    { x: 18, y: 48, label: 'LM' },
+    { x: 38, y: 52, label: 'ZM' },
+    { x: 62, y: 52, label: 'ZM' },
+    { x: 82, y: 48, label: 'RM' },
+    { x: 38, y: 22, label: 'ST' },
+    { x: 62, y: 22, label: 'ST' }
+  ],
+  '4-2-3-1': [
+    { x: 50, y: 92, label: 'TW' },
+    { x: 18, y: 72, label: 'AV' },
+    { x: 38, y: 75, label: 'IV' },
+    { x: 62, y: 75, label: 'IV' },
+    { x: 82, y: 72, label: 'AV' },
+    { x: 38, y: 55, label: 'DM' },
+    { x: 62, y: 55, label: 'DM' },
+    { x: 22, y: 32, label: 'OM' },
+    { x: 50, y: 35, label: 'OM' },
+    { x: 78, y: 32, label: 'OM' },
+    { x: 50, y: 15, label: 'ST' }
+  ],
+  '3-5-2': [
+    { x: 50, y: 92, label: 'TW' },
+    { x: 28, y: 75, label: 'IV' },
+    { x: 50, y: 78, label: 'IV' },
+    { x: 72, y: 75, label: 'IV' },
+    { x: 12, y: 52, label: 'LM' },
+    { x: 35, y: 55, label: 'ZM' },
+    { x: 50, y: 58, label: 'DM' },
+    { x: 65, y: 55, label: 'ZM' },
+    { x: 88, y: 52, label: 'RM' },
+    { x: 40, y: 22, label: 'ST' },
+    { x: 60, y: 22, label: 'ST' }
+  ]
+};
+const FORMATION_NAMES = ['4-3-3', '4-4-2', '4-2-3-1', '3-5-2'];
+const VARIANTEN = ['Standard', 'Pressing', 'Defensiv', 'Konter'];
+
+const UEBUNG_KATEGORIEN = ['aufwaermen', 'technik', 'spielform', 'abschluss', 'konditionell', 'raumdeckung', 'manndeckung', 'viererkette', 'dreierkette'];
+const UEBUNG_KAT_LABEL = {
+  aufwaermen: 'Aufwärmen',
+  technik: 'Technik',
+  spielform: 'Spielform',
+  abschluss: 'Abschluss',
+  konditionell: 'Konditionell',
+  raumdeckung: 'Raumdeckung',
+  manndeckung: 'Manndeckung',
+  viererkette: '4er-Kette',
+  dreierkette: '3er-Kette'
+};
+const UEBUNG_KAT_ICON = {
+  aufwaermen: '🌀',
+  technik: '⚽',
+  spielform: '🔲',
+  abschluss: '🥅',
+  konditionell: '⚡',
+  raumdeckung: '🟦',
+  manndeckung: '👤',
+  viererkette: '4️⃣',
+  dreierkette: '3️⃣'
+};
+
+const PHASEN_DEFAULT = ['Aufwärmen', 'Hauptteil', 'Spielform'];
+
+const SZ_KATEGORIEN = ['angriff', 'standard', 'pressing', 'defensiv', 'raumdeckung', 'manndeckung', 'viererkette', 'dreierkette'];
+const SZ_KAT_LABEL = {
+  angriff: 'Angriff',
+  standard: 'Standard',
+  pressing: 'Pressing',
+  defensiv: 'Defensiv',
+  raumdeckung: 'Raumdeckung',
+  manndeckung: 'Manndeckung',
+  viererkette: '4er-Kette',
+  dreierkette: '3er-Kette'
+};
+const PFEIL_TYPEN = ['lauf', 'pass', 'dribbel'];
+const PFEIL_LABEL = { lauf: 'Lauf', pass: 'Pass', dribbel: 'Dribbel' };
+
+const ZONE_COLORS = ['green', 'red', 'blue', 'yellow'];
+const ZONE_COLOR_LABEL = { green: 'Grün', red: 'Rot', blue: 'Blau', yellow: 'Gelb' };
+const ZONE_COLOR_FILL = {
+  green: 'rgba(99, 153, 34, 0.42)',
+  red:   'rgba(226, 75, 74, 0.42)',
+  blue:  'rgba(74, 144, 226, 0.42)',
+  yellow:'rgba(224, 168, 0, 0.42)'
+};
+const ZONE_COLOR_STROKE = {
+  green: 'rgba(99, 153, 34, 0.95)',
+  red:   'rgba(226, 75, 74, 0.95)',
+  blue:  'rgba(74, 144, 226, 0.95)',
+  yellow:'rgba(224, 168, 0, 0.95)'
+};
+
+function relDate(days) {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function parseISODate(s) {
+  if (!s) return null;
+  const parts = s.split('-');
+  if (parts.length !== 3) return null;
+  const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10), d = parseInt(parts[2], 10);
+  if (!y || !m || !d) return null;
+  return new Date(y, m - 1, d);
+}
+
+function formatDateDE(s) {
+  const d = parseISODate(s);
+  if (!d) return s || '';
+  return d.getDate() + '. ' + MONATE_KURZ[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function isPastDate(s) {
+  const d = parseISODate(s);
+  if (!d) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return d < today;
+}
+
+function newId(prefix) {
+  return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[c]));
+}
+
+function mkSpieler(mannschaft_id, partial) {
+  return Object.assign({
+    id: newId('spieler'),
+    mannschaft_id: mannschaft_id,
+    vorname: '',
+    nachname: '',
+    trikotnummer: 0,
+    position: 'TW',
+    geburtsjahr: new Date().getFullYear() - 14,
+    status: 'fit',
+    ist_kapitaen: false,
+    eltern_kontakt: '',
+    notizen: ''
+  }, partial || {});
+}
+
+function mkTermin(mannschaft_id, partial) {
+  const teamSp = (typeof db !== 'undefined' && db && db.spieler) ? db.spieler.filter(s => s.mannschaft_id === mannschaft_id) : [];
+  return Object.assign({
+    id: newId('termin'),
+    mannschaft_id: mannschaft_id,
+    typ: 'training',
+    datum: relDate(0),
+    uhrzeit_start: '17:30',
+    uhrzeit_ende: '',
+    titel: '',
+    ort: '',
+    gegner: '',
+    heimspiel: true,
+    notizen: '',
+    anwesenheit: teamSp.map(s => ({ spieler_id: s.id, status: 'unbekannt' }))
+  }, partial || {});
+}
+
+function mkAufstellung(mannschaft_id, partial) {
+  return Object.assign({
+    id: newId('aufst'),
+    mannschaft_id: mannschaft_id,
+    name: 'Neue Aufstellung',
+    formation: '4-3-3',
+    variante: 'Standard',
+    positionen: {}
+  }, partial || {});
+}
+
+function mkUebung(partial) {
+  return Object.assign({
+    id: newId('uebung'),
+    name: '',
+    kategorie: 'technik',
+    dauer_min: 15,
+    spieler_min: 6,
+    spieler_max: 12,
+    materialien: [],
+    beschreibung: '',
+    coaching_punkte: '',
+    bilder: []
+  }, partial || {});
+}
+
+function mkTrainingsplan(mannschaft_id, partial) {
+  return Object.assign({
+    id: newId('tp'),
+    mannschaft_id: mannschaft_id,
+    name: 'Neuer Trainingsplan',
+    datum: '',
+    phasen: PHASEN_DEFAULT.map(name => ({ name: name, items: [] })),
+    notizen: ''
+  }, partial || {});
+}
+
+function mkSpielzug(mannschaft_id, partial) {
+  return Object.assign({
+    id: newId('sz'),
+    mannschaft_id: mannschaft_id,
+    name: 'Neuer Spielzug',
+    kategorie: 'angriff',
+    beschreibung: '',
+    elemente: []
+  }, partial || {});
+}
+
+function mkSzEl(type, data) {
+  return Object.assign({ id: newId('el'), type: type }, data || {});
+}
+
+function getSeedSpielzuege(mid) {
+  const S = (n, x, y) => mkSzEl('spieler', { nummer: n, x: x, y: y });
+  const G = (x, y) => mkSzEl('gegner', { x: x, y: y });
+  const B = (x, y) => mkSzEl('ball', { x: x, y: y });
+  const PA = (x1, y1, x2, y2, ph) => mkSzEl('pfeil', { subtyp: 'pass', x1: x1, y1: y1, x2: x2, y2: y2, phase: ph });
+  const LP = (x1, y1, x2, y2, ph) => mkSzEl('pfeil', { subtyp: 'lauf', x1: x1, y1: y1, x2: x2, y2: y2, phase: ph });
+  const DP = (x1, y1, x2, y2, ph) => mkSzEl('pfeil', { subtyp: 'dribbel', x1: x1, y1: y1, x2: x2, y2: y2, phase: ph });
+  const Z = (color, label, points) => mkSzEl('zone', { color: color, label: label, points: points });
+  const mk = (name, kategorie, beschreibung, elemente) => ({ id: newId('sz'), mannschaft_id: mid, name: name, kategorie: kategorie, beschreibung: beschreibung, elemente: elemente });
+
+  return [
+    // === ANGRIFF ===
+    mk('Konter über rechts', 'angriff',
+      'Phase 1: Sechser hat Ball, Flügelspieler startet seinen Lauf. Phase 2: Vertikalpass auf den Flügel, gleichzeitig sprintet der Stürmer in die Mitte. Phase 3: Ablage vom Flügel auf den Stürmer.',
+      [
+        S(1, 50, 95), S(6, 50, 70), S(7, 75, 55), S(9, 50, 40),
+        B(50, 70), G(45, 55), G(60, 45),
+        LP(75, 55, 80, 40, 1),
+        PA(50, 70, 80, 40, 2), LP(50, 40, 60, 25, 2),
+        PA(80, 40, 60, 25, 3)
+      ]),
+    mk('Doppelpass mit Gegnerdruck', 'angriff',
+      'Phase 1: Spieler 6 hat Ball, Gegner kommt heran, Spieler 8 bietet sich an. Phase 2: Pass auf 8, gleichzeitig löst sich 6 vom Gegner. Phase 3: Rückpass in den freien Raum. Phase 4: Spieler 6 dribbelt aufs Tor.',
+      [
+        S(1, 50, 95), S(6, 50, 65), S(8, 35, 55),
+        B(50, 65), G(55, 60),
+        LP(55, 60, 50, 60, 1), LP(35, 55, 32, 50, 1),
+        PA(50, 65, 32, 50, 2), LP(50, 65, 42, 40, 2),
+        PA(32, 50, 42, 40, 3),
+        DP(42, 40, 50, 15, 4)
+      ]),
+    mk('3-gegen-2 Überzahl auf Flügel', 'angriff',
+      'Phase 1: Mittelfeldspieler dribbelt nach vorne, beide Flügelstürmer starten Sprints, Innenverteidiger reagieren. Phase 2: Pass nach außen, Stürmer macht Diagonallauf. Phase 3: Hereingabe vom Flügel.',
+      [
+        S(1, 50, 95), S(8, 50, 55), S(7, 75, 45), S(11, 25, 45), S(9, 50, 30),
+        B(50, 55), G(40, 35), G(60, 35),
+        DP(50, 55, 50, 42, 1), LP(75, 45, 85, 25, 1), LP(25, 45, 35, 28, 1), LP(40, 35, 35, 30, 1),
+        PA(50, 42, 85, 25, 2), LP(50, 30, 55, 18, 2), LP(60, 35, 65, 28, 2),
+        PA(85, 25, 55, 18, 3)
+      ]),
+    mk('Steilpass in den Lauf', 'angriff',
+      'Phase 1: Sechser steht zentral, Stürmer schmeißt sich zwischen die IVs. Phase 2: Scharfer Steilpass in den Lauf, gleichzeitig löst der Stürmer und IVs versuchen zu sichern. Phase 3: Stürmer nimmt mit und schießt.',
+      [
+        S(1, 50, 95), S(6, 50, 65), S(9, 50, 45),
+        B(50, 65), G(40, 40), G(60, 40),
+        LP(50, 45, 55, 30, 1),
+        PA(50, 65, 55, 30, 2), LP(40, 40, 50, 35, 2), LP(60, 40, 55, 35, 2),
+        PA(55, 30, 50, 8, 3)
+      ]),
+
+    // === STANDARD ===
+    mk('Eckball kurz', 'standard',
+      'Phase 1: Ecke kurz zum nahen Anspielpartner, Schütze läuft sich frei. Phase 2: Rückpass zum freilaufenden Schützen. Phase 3: Flanke in den Strafraum auf den heranstürmenden Innenverteidiger.',
+      [
+        S(7, 96, 5), S(8, 88, 12), S(9, 50, 12), S(10, 38, 14), S(4, 50, 30),
+        B(96, 5), G(50, 4), G(45, 10), G(55, 10),
+        PA(96, 5, 88, 12, 1), LP(96, 5, 82, 16, 1),
+        PA(88, 12, 82, 16, 2), LP(50, 30, 50, 12, 2),
+        PA(82, 16, 50, 12, 3)
+      ]),
+    mk('Eckball lang an den langen Pfosten', 'standard',
+      'Phase 1: Eckball wird hochgeschlagen, Stürmer starten Laufwege zu kurzem und langem Pfosten. Phase 2: Hoher Ball an den langen Pfosten, Kopfball zurück in die Mitte.',
+      [
+        S(7, 96, 5), S(9, 60, 12), S(10, 40, 14), S(4, 50, 22),
+        B(96, 5), G(50, 4), G(45, 9), G(55, 9),
+        LP(60, 12, 38, 8, 1), LP(40, 14, 55, 10, 1),
+        PA(96, 5, 38, 8, 2),
+        PA(38, 8, 55, 6, 3)
+      ]),
+    mk('Freistoß zentral - Direktschuss', 'standard',
+      'Phase 1: Mitspieler täuschen Anlauf, Mauer wird irritiert. Phase 2: Schuss in die kurze Ecke.',
+      [
+        S(10, 50, 38), S(8, 47, 36), S(9, 60, 30), S(4, 35, 30),
+        B(50, 38),
+        G(46, 25), G(50, 25), G(54, 25), G(50, 4),
+        LP(60, 30, 56, 25, 1), LP(35, 30, 40, 25, 1),
+        PA(50, 38, 32, 8, 2)
+      ]),
+    mk('Einwurf schnell auflösen', 'standard',
+      'Phase 1: Einwurf zum nächsten Spieler, Ablage-Spieler bietet sich an. Phase 2: Direkte Weiterleitung in den Raum.',
+      [
+        S(2, 2, 55), S(6, 14, 50), S(8, 28, 45),
+        B(2, 55), G(18, 60),
+        PA(2, 55, 14, 50, 1), LP(28, 45, 25, 42, 1),
+        PA(14, 50, 25, 42, 2)
+      ]),
+
+    // === PRESSING ===
+    mk('Hohes Pressing 4-3-3', 'pressing',
+      'Phase 1: Alle drei Stürmer laufen den ballführenden Innenverteidiger und seine Anspielstationen synchron an. Wichtig: gleichzeitig, sonst entstehen Passwege.',
+      [
+        S(9, 50, 32), S(7, 70, 30), S(11, 30, 30),
+        B(30, 85), G(30, 85), G(70, 85), G(50, 70),
+        LP(50, 32, 35, 78, 1), LP(30, 30, 25, 75, 1), LP(70, 30, 55, 70, 1)
+      ]),
+    mk('Pressing nach Querpass', 'pressing',
+      'Phase 1: Gegnerischer Querpass als Auslöser, ballnaher Stürmer stürmt heraus, Mittelfeldspieler rückt nach. Phase 2: Druck wird verdichtet, weitere Verschiebung.',
+      [
+        S(1, 50, 95), S(4, 35, 70), S(5, 65, 70), S(6, 50, 55), S(8, 35, 50), S(9, 50, 38),
+        B(30, 78), G(30, 78), G(70, 78),
+        PA(30, 78, 70, 78, 1), LP(50, 38, 65, 72, 1), LP(35, 50, 50, 65, 1),
+        LP(65, 70, 70, 75, 2), LP(50, 55, 55, 60, 2)
+      ]),
+    mk('Pressing nach Rückpass zum Torwart', 'pressing',
+      'Phase 1: Gegner spielt zurück zum Torwart - der Auslöser. Phase 2: Stürmer attackiert sofort, Flügelspieler schließen Anspielstationen.',
+      [
+        S(9, 50, 35), S(7, 70, 38), S(11, 30, 38),
+        B(50, 70), G(50, 70), G(50, 90), G(25, 70), G(75, 70),
+        PA(50, 70, 50, 90, 1),
+        LP(50, 35, 50, 82, 2), LP(70, 38, 75, 65, 2), LP(30, 38, 25, 65, 2)
+      ]),
+
+    // === DEFENSIV ===
+    mk('Verschieben bei Flügelangriff', 'defensiv',
+      'Phase 1: Gegner verlagert nach außen. Phase 2: Die gesamte Defensiv-Reihe schiebt synchron in Ballrichtung, kein Spieler isoliert.',
+      [
+        S(1, 50, 92), S(4, 38, 75), S(5, 62, 75), S(6, 50, 62), S(10, 62, 58), S(11, 75, 55),
+        B(50, 32), G(50, 32), G(80, 42),
+        PA(50, 32, 80, 32, 1),
+        LP(75, 55, 82, 50, 2), LP(62, 58, 72, 58, 2), LP(50, 62, 62, 62, 2), LP(38, 75, 48, 75, 2)
+      ]),
+    mk('Tiefer Block - Mitte zustellen', 'defensiv',
+      'Phase 1: Gegner spielt quer im Mittelfeld. Phase 2: Komplette Linie verschiebt synchron mit dem Ball, keine Lücken zwischen den Reihen.',
+      [
+        S(1, 50, 92), S(4, 38, 75), S(5, 62, 75), S(2, 18, 72), S(3, 82, 72),
+        S(6, 50, 62), S(8, 38, 58), S(10, 62, 58), S(7, 25, 55), S(11, 75, 55),
+        S(9, 50, 45),
+        B(35, 30), G(35, 30), G(65, 30), G(50, 20),
+        PA(35, 30, 65, 30, 1),
+        LP(25, 55, 35, 55, 2), LP(38, 58, 48, 58, 2), LP(62, 58, 58, 58, 2),
+        LP(38, 75, 45, 75, 2), LP(62, 75, 58, 75, 2)
+      ]),
+    mk('Doppeln am Flügel', 'defensiv',
+      'Phase 1: Gegner-Flügel bekommt Ball. Phase 2: Eigener Außenverteidiger geht ran, Außenmittelfeldspieler doppelt von oben - der Gegner hat keinen Ausweg.',
+      [
+        S(1, 50, 95), S(3, 78, 70), S(11, 80, 50),
+        B(85, 55), G(85, 55), G(60, 60),
+        PA(60, 60, 85, 55, 1),
+        LP(78, 70, 82, 58, 2), LP(80, 50, 88, 55, 2)
+      ]),
+
+    // === RAUMDECKUNG ===
+    mk('Raumdeckung vs. Manndeckung — Prinzip', 'raumdeckung',
+      'Visualisierung der beiden Konzepte: Bei Raumdeckung deckt jeder Spieler eine Zone (grün), bei Manndeckung den Gegner direkt (rot). Im Jugendfußball meist Mischformen.',
+      [
+        S(4, 30, 75), S(5, 50, 78), S(6, 38, 65), S(8, 45, 60),
+        S(7, 75, 65), S(11, 65, 55), S(10, 80, 50),
+        G(35, 60), G(45, 55), G(50, 70),
+        G(70, 60), G(78, 55), G(85, 50),
+        Z('green', 'Raumdeckung', [{x:18,y:80},{x:48,y:50},{x:55,y:40},{x:58,y:80}]),
+        Z('red', 'Manndeckung', [{x:60,y:75},{x:60,y:45},{x:88,y:42},{x:90,y:75}])
+      ]),
+    mk('Pressing-Zone im Mittelfeld', 'raumdeckung',
+      'Wir lassen den Gegner kommen — sobald der Ball in die rote Pressing-Zone gespielt wird, attackieren alle dort befindlichen Spieler sofort. Außerhalb: ruhig stehen.',
+      [
+        S(6, 50, 60), S(8, 35, 55), S(10, 65, 55), S(9, 50, 45),
+        B(30, 75), G(30, 75), G(70, 75), G(50, 90),
+        Z('red', 'Pressing-Zone', [{x:25,y:42},{x:75,y:42},{x:80,y:65},{x:20,y:65}]),
+        PA(30, 75, 50, 60, 1),
+        LP(50, 45, 50, 58, 2), LP(35, 55, 45, 58, 2), LP(65, 55, 55, 58, 2)
+      ]),
+    mk('Ballorientiertes Verschieben', 'raumdeckung',
+      'Phase 1: Gegner verlagert quer. Phase 2: 4er-Kette schiebt geschlossen mit. Die grüne Zone zeigt: Verteidigung bleibt kompakt, niemand hängt durch.',
+      [
+        S(2, 18, 72), S(4, 38, 75), S(5, 62, 75), S(3, 82, 72),
+        B(25, 35), G(25, 35), G(75, 35),
+        Z('green', 'Aktiver Block', [{x:14,y:68},{x:86,y:68},{x:86,y:80},{x:14,y:80}]),
+        PA(25, 35, 75, 35, 1),
+        LP(18, 72, 42, 72, 2), LP(38, 75, 58, 75, 2), LP(62, 75, 75, 75, 2), LP(82, 72, 88, 72, 2)
+      ]),
+    mk('Zonen-Aufteilung 4-3-3', 'raumdeckung',
+      'Jeder Mittelfeldspieler ist für eine Zone zuständig. Sechser deckt die Mitte, die Achter die Halbräume. So entsteht ein dichtes Netz ohne Mannbezug.',
+      [
+        S(1, 50, 95), S(4, 35, 78), S(5, 65, 78), S(6, 50, 60), S(8, 30, 55), S(10, 70, 55),
+        S(11, 18, 35), S(9, 50, 30), S(7, 82, 35),
+        Z('blue', 'Sechser', [{x:38,y:50},{x:62,y:50},{x:60,y:70},{x:40,y:70}]),
+        Z('green', 'Achter links', [{x:18,y:45},{x:38,y:45},{x:38,y:68},{x:18,y:68}]),
+        Z('green', 'Achter rechts', [{x:62,y:45},{x:82,y:45},{x:82,y:68},{x:62,y:68}])
+      ]),
+
+    // === MANNDECKUNG ===
+    mk('Manndeckung im Strafraum', 'manndeckung',
+      'Bei Standards: jeder Verteidiger nimmt einen Gegner. Die rote Zone zeigt den kritischen Bereich vor dem Tor — hier darf kein Gegner unbewacht stehen.',
+      [
+        S(1, 50, 92), S(4, 35, 78), S(5, 50, 78), S(6, 65, 78), S(8, 40, 70), S(10, 60, 70),
+        G(35, 75), G(50, 75), G(65, 75), G(42, 67), G(58, 67),
+        Z('red', 'Manndeckungs-Zone', [{x:22,y:60},{x:78,y:60},{x:78,y:85},{x:22,y:85}])
+      ]),
+    mk('Eng am Mann durchs Mittelfeld', 'manndeckung',
+      'Phase 1: Gegner-Zehner versucht sich zu lösen. Phase 2: Eigener Sechser folgt im Schatten — bleibt immer zwischen Mann und eigenem Tor.',
+      [
+        S(6, 50, 65),
+        G(50, 55),
+        LP(50, 55, 70, 40, 1), LP(50, 65, 70, 50, 1),
+        LP(70, 40, 80, 30, 2), LP(70, 50, 80, 40, 2)
+      ]),
+    mk('Übergabe im Strafraum', 'manndeckung',
+      'Phase 1: Gegner kreuzen im Strafraum. Phase 2: Verteidiger rufen "Übergabe!" und tauschen Gegner. Kein Spieler verfolgt blind.',
+      [
+        S(4, 40, 80), S(5, 60, 80),
+        G(40, 70), G(60, 70),
+        LP(40, 70, 65, 65, 1), LP(60, 70, 35, 65, 1),
+        LP(40, 80, 60, 75, 2), LP(60, 80, 40, 75, 2)
+      ]),
+    mk('Mannorientiert im Angriffsdrittel', 'manndeckung',
+      'Hohes Pressing mit Mannbezug: jeder eigene Spieler nimmt einen Gegenspieler ab dem Anstoß. Die rote Zone markiert den Bereich, in dem aggressiv gepresst wird.',
+      [
+        S(9, 50, 35), S(7, 70, 38), S(11, 30, 38), S(8, 50, 50),
+        G(50, 90), G(30, 80), G(70, 80), G(50, 65),
+        Z('red', 'Mannbezug aktiv', [{x:15,y:25},{x:85,y:25},{x:85,y:70},{x:15,y:70}]),
+        LP(50, 35, 50, 82, 1), LP(30, 38, 30, 75, 1), LP(70, 38, 70, 75, 1), LP(50, 50, 50, 62, 1)
+      ]),
+
+    // === RAUTE / FORMATIONEN als Angriff ===
+    mk('Aufbau aus der Raute 4-1-2-1-2', 'angriff',
+      'Mittelfeld-Raute: Sechser (10) tief, zwei Achter (6,8) auf den Halbpositionen, Zehner (10) hoch. Phase 1: Sechser dreht auf, Achter zeigen sich an. Phase 2: Vertikalpass auf den Zehner. Phase 3: Ablage auf einlaufenden Achter.',
+      [
+        S(1, 50, 95), S(4, 35, 78), S(5, 65, 78), S(2, 18, 75), S(3, 82, 75),
+        S(6, 35, 60), S(8, 65, 60), S(10, 50, 70), S(11, 50, 45), S(9, 45, 28), S(7, 55, 28),
+        B(50, 70),
+        Z('blue', 'Mittelfeld-Raute', [{x:50,y:70},{x:35,y:60},{x:50,y:45},{x:65,y:60}]),
+        LP(35, 60, 32, 50, 1), LP(65, 60, 68, 50, 1),
+        PA(50, 70, 50, 45, 2),
+        PA(50, 45, 32, 50, 3), LP(35, 60, 40, 35, 3)
+      ]),
+    mk('Defensive Raute (5-1-2-2)', 'defensiv',
+      'Defensive Mittelfeld-Raute: Sechser tief, zwei Halbpositionen, Zehner als erster Verteidiger. Die rote Zone zeigt den abgedeckten Mittelfeldbereich — kein Pass durchs Zentrum möglich.',
+      [
+        S(1, 50, 95), S(4, 30, 78), S(5, 50, 80), S(6, 70, 78), S(2, 12, 70), S(3, 88, 70),
+        S(8, 35, 58), S(10, 65, 58), S(11, 50, 65), S(9, 50, 45), S(7, 50, 30),
+        Z('red', 'Raute deckt Mitte', [{x:35,y:58},{x:50,y:45},{x:65,y:58},{x:50,y:68}])
+      ]),
+
+    // === 4ER-KETTE ===
+    mk('Verschieben der 4er-Kette', 'viererkette',
+      'Phase 1: Ball wird vom Gegner nach außen verlagert. Phase 2: Die komplette Kette schiebt synchron mit. Der ballferne Außenverteidiger rückt zur Mitte, der ballnahe attackiert.',
+      [
+        S(2, 18, 75), S(4, 38, 75), S(5, 62, 75), S(3, 82, 75),
+        B(50, 40), G(50, 40), G(82, 45),
+        PA(50, 40, 82, 45, 1),
+        LP(18, 75, 38, 75, 2), LP(38, 75, 55, 75, 2), LP(62, 75, 72, 75, 2), LP(82, 75, 85, 60, 2)
+      ]),
+    mk('Außenverteidiger rückt heraus', 'viererkette',
+      'Phase 1: Gegner-Flügelspieler bekommt den Ball. Phase 2: Eigener AV rückt heraus, der IV schiebt diagonal hinten ab - er nimmt jetzt die Position des AVs ein.',
+      [
+        S(2, 18, 75), S(4, 38, 75), S(5, 62, 75), S(3, 82, 75),
+        B(85, 55), G(85, 55), G(50, 50),
+        PA(50, 50, 85, 55, 1),
+        LP(82, 75, 88, 60, 2), LP(62, 75, 75, 72, 2), LP(38, 75, 55, 75, 2), LP(18, 75, 35, 75, 2)
+      ]),
+    mk('Diagonalsicherung in der 4er-Kette', 'viererkette',
+      'Phase 1: Ein IV muss rausrücken zum Stürmer. Phase 2: Der zweite IV sichert diagonal nach hinten ab - es entsteht keine direkte Lücke zum Tor.',
+      [
+        S(2, 18, 78), S(4, 38, 75), S(5, 62, 75), S(3, 82, 78),
+        G(40, 50),
+        LP(38, 75, 40, 60, 1),
+        LP(62, 75, 50, 80, 2)
+      ]),
+
+    // === 3ER-KETTE ===
+    mk('Verschieben der 3er-Kette', 'dreierkette',
+      'Phase 1: Ballverlagerung vom Gegner nach rechts. Phase 2: 3 Innenverteidiger plus 2 Flügelverteidiger schieben mit. Der ballferne Flügel rückt fast zum vierten IV.',
+      [
+        S(4, 30, 78), S(5, 50, 80), S(6, 70, 78),
+        S(2, 10, 60), S(3, 90, 60),
+        B(20, 40), G(20, 40), G(80, 40),
+        PA(20, 40, 80, 40, 1),
+        LP(10, 60, 35, 70, 2), LP(30, 78, 45, 78, 2), LP(50, 80, 60, 78, 2),
+        LP(70, 78, 80, 72, 2), LP(90, 60, 92, 50, 2)
+      ]),
+    mk('Halbverteidiger rückt heraus', 'dreierkette',
+      'Phase 1: Gegner-Zehner bekommt Ball zwischen den Linien. Phase 2: Der ballnahe Halbverteidiger rückt aggressiv heraus, mittlerer IV sichert diagonal, ballferner Halbverteidiger rückt mittig nach.',
+      [
+        S(4, 30, 78), S(5, 50, 80), S(6, 70, 78),
+        B(60, 55), G(60, 55),
+        LP(70, 78, 65, 60, 1),
+        LP(50, 80, 60, 75, 2), LP(30, 78, 45, 78, 2)
+      ]),
+    mk('Flügelverteidiger schiebt hoch', 'dreierkette',
+      'Phase 1: Ballbesitz vorne, Flügelverteidiger startet seinen Lauf nach vorne. Phase 2: Der ballferne Halbverteidiger schiebt mit zur Sicherung nach außen.',
+      [
+        S(4, 30, 78), S(5, 50, 80), S(6, 70, 78),
+        S(2, 12, 60), S(3, 88, 60),
+        B(50, 50),
+        LP(88, 60, 90, 35, 1),
+        LP(70, 78, 80, 70, 2)
+      ])
+  ];
+}
+
+function getSeedUebungen() {
+  const U = (name, kategorie, dauer, smin, smax, mats, beschr, coach) => ({
+    id: newId('uebung'), name: name, kategorie: kategorie,
+    dauer_min: dauer, spieler_min: smin, spieler_max: smax,
+    materialien: mats, beschreibung: beschr, coaching_punkte: coach
+  });
+  return [
+    // === AUFWÄRMEN ===
+    U('Passquadrat 4v2', 'aufwaermen', 12, 6, 8,
+      ['4 Hütchen', '2 Bälle', 'Leibchen'],
+      'Quadrat 8×8m, vier Außenspieler passen sich an, zwei in der Mitte erobern. Bei Ballgewinn Rollentausch.',
+      'Erstes Anbieten, offene Stellung, Tempo halten.'),
+    U('Rondo 5v2', 'aufwaermen', 10, 7, 9,
+      ['Hütchen', 'Ball', 'Leibchen'],
+      'Klassisches Rondo, 5 außen, 2 innen. Maximal 2 Kontakte.',
+      'Körperstellung, Ball mitnehmen statt stoppen.'),
+    U('Hütchenslalom mit Ball', 'aufwaermen', 10, 4, 16,
+      ['8 Hütchen pro Bahn', 'Bälle'],
+      'Slalombahn mit 6-8 Hütchen, Ball am Fuß führen. Erst rechts, dann links, dann beide Füße im Wechsel.',
+      'Ball eng am Fuß, Blick auch nach oben, Wechsel zwischen Innen- und Außenrist.'),
+
+    // === TECHNIK ===
+    U('Passmuster Y-Form', 'technik', 15, 6, 10,
+      ['6 Hütchen', '2 Bälle'],
+      'Y-förmige Passstruktur, Doppelpass mit Vorbereitendem, Abschluss am Ende der Sequenz.',
+      'Timing des Anbietens, Pass in den Lauf, sauberer erster Kontakt.'),
+    U('Flügelangriff & Hereingabe', 'technik', 20, 8, 12,
+      ['Hütchen', 'Bälle', 'Tore'],
+      'Spielaufbau über außen, Doppelpass mit Sechser, Hereingabe von der Grundlinie. Zwei Stürmer suchen kurzen/langen Pfosten.',
+      'Tiefe vor der Hereingabe, Laufwege im Strafraum kreuzen.'),
+    U('Ballannahme im Quadrat', 'technik', 12, 6, 12,
+      ['4 Hütchen', 'Bälle'],
+      'Quadrat 10×10m. Spieler in der Mitte bekommt Pässe von außen, dreht sich mit Ball, spielt zur anderen Seite weiter. Wechsel nach 3 Min.',
+      'Vor der Annahme über die Schulter schauen, offene Stellung, Ball mitnehmen.'),
+
+    // === SPIELFORM ===
+    U('6 gegen 6 auf 4 Tore', 'spielform', 20, 12, 14,
+      ['Hütchen', 'Bälle', '4 Minitore'],
+      'Zwei Teams, je vier Minitore (zwei pro Mannschaft auf den Außenlinien). Spielfeld breit halten, schnelles Umschalten.',
+      'Spielfeld weit machen, Verschieben in der Defensive, schnell umschalten.'),
+    U('Pressing-Auslöser', 'spielform', 25, 14, 18,
+      ['Hütchen', 'Bälle', 'Leibchen', 'Tore'],
+      'Spielform 8v8 auf großem Feld. Definierter Pressing-Auslöser (z.B. Pass auf Außenverteidiger). Bei Ballgewinn maximal 3 Sekunden zum Abschluss.',
+      'Synchron anlaufen, Passwege schließen, nicht überlaufen.'),
+    U('Funino 3v3', 'spielform', 15, 6, 6,
+      ['Hütchen', 'Bälle', '4 Minitore'],
+      'Kleinfeld ca. 25×15m, je zwei Minitore auf jeder Grundlinie. 3 gegen 3 ohne Torwart. Schnelles Spiel, viele Ballkontakte.',
+      'Anbieten in Tornähe, schnell entscheiden, beide Tore im Blick.'),
+
+    // === ABSCHLUSS ===
+    U('Torabschluss aus dem Halbfeld', 'abschluss', 15, 6, 12,
+      ['Bälle', 'Tor mit Torhüter'],
+      'Zuspiel aus dem Halbfeld, Mitnahme und Abschluss aus 16-20m. Variation: links/rechts, mit/ohne Gegnerdruck.',
+      'Sauberer erster Kontakt aus dem Lauf, Schusstechnik (Innenseite / Spann).'),
+    U('Torschuss nach Doppelpass', 'abschluss', 15, 6, 10,
+      ['Hütchen', 'Bälle', 'Tor mit Torhüter'],
+      'Spieler dribbelt an, spielt Doppelpass mit Wandspieler an der Strafraumkante, Abschluss mit dem zweiten Kontakt.',
+      'Tempo halten beim Doppelpass, Schussfuß früh fixieren.'),
+
+    // === KONDITIONELL ===
+    U('Antritte mit Ball', 'konditionell', 12, 4, 16,
+      ['Hütchen', 'Bälle'],
+      'Kurze Antritte 5-10m mit Ball am Fuß, dann lockerer Trab zurück. 8 Wiederholungen pro Spieler.',
+      'Erste 3 Schritte explosiv, Ball eng führen.'),
+    U('Sprint-Pyramide mit Ball', 'konditionell', 10, 4, 16,
+      ['Hütchen', 'Bälle'],
+      'Sprints über 10m, 20m, 30m, 20m, 10m. Zwischen jedem Sprint zurücktraben. 2 Durchgänge mit Pause.',
+      'Saubere Antrittstechnik, gleichmäßiges Tempo halten.'),
+
+    // === RAUMDECKUNG ===
+    U('Verteidigen der Zone', 'raumdeckung', 15, 8, 12,
+      ['Hütchen für Zonen', 'Leibchen', 'Bälle'],
+      'Spielfeld in 3-4 Zonen einteilen. Jeder Verteidiger ist für seine Zone zuständig. Angreifer dürfen frei wechseln. Verteidiger geht erst raus aus der Zone, wenn keine Übergabe möglich ist.',
+      'Position halten, nicht hinterherlaufen, Übergabe rufen.'),
+    U('Verschieben in der Linie', 'raumdeckung', 12, 6, 10,
+      ['Hütchen', 'Bälle'],
+      '4 Spieler bilden eine Linie. Trainer zeigt mit Ball nach links, rechts, mitte. Die Linie verschiebt synchron, hält Abstand zueinander.',
+      'Synchron mit dem Ball verschieben, gleicher Abstand, niemand hängt durch.'),
+    U('3 gegen 3 in Zonen', 'raumdeckung', 15, 6, 6,
+      ['Hütchen', 'Bälle', 'Leibchen'],
+      'Feld in 3 Längs-Zonen. Pro Zone darf nur ein Verteidiger sein. Angreifer suchen Lücken zwischen den Zonen.',
+      'Zone halten, rechtzeitig übergeben, kommunizieren.'),
+
+    // === MANNDECKUNG ===
+    U('1 gegen 1 Verteidigen', 'manndeckung', 12, 4, 12,
+      ['Hütchen', 'Bälle'],
+      'Angreifer dribbelt auf Verteidiger zu, Verteidiger muss den Ball erobern oder ins Aus drücken. 30 Sekunden pro Duell, dann Wechsel.',
+      'Halbe Position, niedriger Schwerpunkt, geduldig bleiben, nicht überstürzt eingreifen.'),
+    U('Manndeckung im Strafraum', 'manndeckung', 15, 6, 12,
+      ['Bälle', 'Tor', 'Leibchen'],
+      'Standardsituationen: jeder Verteidiger nimmt einen Angreifer. Trainer flankt von außen. Verteidiger bleibt eng am Mann und versucht den Kopfball.',
+      'Körperkontakt halten, vor dem Mann stehen, im Rücken bleiben verboten.'),
+    U('Verfolgen über das Feld', 'manndeckung', 12, 4, 14,
+      ['Hütchen für Felder', 'Leibchen'],
+      'Paare bilden (Angreifer/Verteidiger). Angreifer läuft frei über das Feld, Verteidiger bleibt im "Schatten" — immer zwischen Angreifer und eigenem Tor.',
+      'Nie den Mann verlieren, beim Sprint nicht aus den Augen lassen, eng bleiben.'),
+
+    // === 4ER-KETTE ===
+    U('Grundverhalten der 4er-Kette', 'viererkette', 15, 4, 10,
+      ['Hütchen', 'Bälle'],
+      '4 Verteidiger stehen in der Linie. Trainer rollt den Ball seitlich oder zentral. Der ballnahe Verteidiger rückt heraus, die anderen schieben rüber und sichern diagonal ab.',
+      'Einer raus, drei sichern. Kein Loch in der Mitte. Kommunikation zwingend.'),
+    U('Verschieben der 4er-Kette', 'viererkette', 18, 4, 12,
+      ['Hütchen', 'Bälle', 'Leibchen'],
+      'Zwei Angreifer spielen Querpässe. Die 4er-Kette verschiebt mit dem Ball. Wichtig: gleicher Abstand zwischen den Verteidigern bleibt.',
+      'Synchron verschieben, ballfern eng zusammen, ballnah Druck machen.'),
+    U('Herausrücken & Sichern', 'viererkette', 15, 4, 10,
+      ['Hütchen', 'Bälle', 'Leibchen'],
+      'Ein Angreifer bekommt im Mittelfeld den Ball. Der ballnahe Innenverteidiger rückt heraus, der zweite IV sichert diagonal. Außenverteidiger schiebt nach.',
+      'Schritt nach vorne nur wenn Pass schon gespielt ist, sonst Lücke. Diagonalsicherung Pflicht.'),
+
+    // === 3ER-KETTE ===
+    U('Grundverhalten der 3er-Kette', 'dreierkette', 15, 3, 10,
+      ['Hütchen', 'Bälle'],
+      '3 Innenverteidiger plus 2 Flügelverteidiger. Trainer spielt Pässe in Räume. Mittlerer IV organisiert, die beiden Halbverteidiger rücken bei Bedarf heraus.',
+      'Mittlerer IV bleibt tief, Halbverteidiger aggressiv beim Herausrücken.'),
+    U('Verschieben der 3er-Kette mit Flügelspielern', 'dreierkette', 18, 5, 12,
+      ['Hütchen', 'Bälle', 'Leibchen'],
+      'Die Kette mit Flügelverteidigern verschiebt mit dem Ball. Bei Ball auf rechts schiebt der linke Flügel ein, der linke Halbverteidiger wird zum dritten IV.',
+      'Ballferner Flügel rückt mit ein, Kette bleibt geschlossen, niemand isoliert.'),
+    U('Diagonalsicherung in der 3er-Kette', 'dreierkette', 15, 3, 9,
+      ['Hütchen', 'Bälle'],
+      'Angreifer attackiert über außen. Halbverteidiger rückt raus, mittlerer IV sichert diagonal, ballferner Halbverteidiger rückt mittig nach.',
+      'Niemand bleibt stehen — alle drei in Bewegung, kein Loch in der Mitte.')
+  ];
+}
+
+function seedDb() {
+  const teamId = newId('team');
+  const sps = [
+    mkSpieler(teamId, { trikotnummer: 1, vorname: 'Leon', nachname: 'Müller', position: 'TW', geburtsjahr: 2011, status: 'fit' }),
+    mkSpieler(teamId, { trikotnummer: 4, vorname: 'Jonas', nachname: 'Krüger', position: 'IV', geburtsjahr: 2011, status: 'fit', ist_kapitaen: true, eltern_kontakt: 'Klaus Krüger · 0171 234 5678' }),
+    mkSpieler(teamId, { trikotnummer: 5, vorname: 'Paul', nachname: 'Hoffmann', position: 'IV', geburtsjahr: 2012, status: 'fit' }),
+    mkSpieler(teamId, { trikotnummer: 6, vorname: 'Tim', nachname: 'Schulz', position: 'DM', geburtsjahr: 2012, status: 'fraglich' }),
+    mkSpieler(teamId, { trikotnummer: 8, vorname: 'Max', nachname: 'Reiter', position: 'ZM', geburtsjahr: 2011, status: 'fit' }),
+    mkSpieler(teamId, { trikotnummer: 9, vorname: 'Noah', nachname: 'Berger', position: 'ST', geburtsjahr: 2011, status: 'verletzt', notizen: 'Muskelfaserriss, 4 Wochen Pause' }),
+    mkSpieler(teamId, { trikotnummer: 11, vorname: 'Finn', nachname: 'Weber', position: 'LA', geburtsjahr: 2011, status: 'fit' })
+  ];
+  function awAll(overrides) {
+    overrides = overrides || {};
+    return sps.map((s, i) => ({ spieler_id: s.id, status: overrides[i] || 'zugesagt' }));
+  }
+  const fresh = Object.assign({}, DEFAULT_DB, {
+    meta: { version: 1, active_mannschaft_id: teamId },
+    mannschaften: [{ id: teamId, name: 'SV Beispiel U15', saison: '25/26', jahrgang: 2011 }],
+    spieler: sps,
+    termine: [
+      { id: newId('termin'), mannschaft_id: teamId, typ: 'training', datum: relDate(-7), uhrzeit_start: '17:30', uhrzeit_ende: '19:00', titel: 'Standards & Eckbälle', ort: 'Platz 2', gegner: '', heimspiel: true, notizen: '', anwesenheit: awAll({ 5: 'abgesagt' }) },
+      { id: newId('termin'), mannschaft_id: teamId, typ: 'spiel', datum: relDate(-3), uhrzeit_start: '11:00', uhrzeit_ende: '', titel: 'vs FC Sonne', ort: 'Auswärts', gegner: 'FC Sonne', heimspiel: false, notizen: 'Endstand 3:1', anwesenheit: awAll({ 3: 'fraglich', 5: 'abgesagt' }) },
+      { id: newId('termin'), mannschaft_id: teamId, typ: 'training', datum: relDate(2), uhrzeit_start: '17:30', uhrzeit_ende: '19:00', titel: 'Passspiel & Pressing', ort: 'Platz 2', gegner: '', heimspiel: true, notizen: '', anwesenheit: awAll({ 0: 'unbekannt', 3: 'fraglich', 5: 'abgesagt' }) },
+      { id: newId('termin'), mannschaft_id: teamId, typ: 'spiel', datum: relDate(4), uhrzeit_start: '11:00', uhrzeit_ende: '', titel: 'vs FC Nachbar', ort: 'Heim', gegner: 'FC Nachbar', heimspiel: true, notizen: '', anwesenheit: sps.map(s => ({ spieler_id: s.id, status: 'unbekannt' })) }
+    ],
+    aufstellungen: [
+      {
+        id: newId('aufst'),
+        mannschaft_id: teamId,
+        name: 'Standard 4-3-3',
+        formation: '4-3-3',
+        variante: 'Standard',
+        positionen: { '0': sps[0].id, '2': sps[1].id, '3': sps[2].id, '6': sps[3].id, '5': sps[4].id, '9': sps[5].id, '8': sps[6].id }
+      }
+    ],
+    uebungen: [],
+    trainingsplaene: []
+  });
+  const seedUe = getSeedUebungen();
+  fresh.uebungen = seedUe;
+  const findUe = (name) => seedUe.find(u => u.name === name);
+  const passq = findUe('Passquadrat 4v2');
+  const passmuster = findUe('Passmuster Y-Form');
+  const fluegel = findUe('Flügelangriff & Hereingabe');
+  const sechsv6 = findUe('6 gegen 6 auf 4 Tore');
+  if (passq && passmuster && fluegel && sechsv6) {
+    fresh.trainingsplaene = [{
+      id: newId('tp'),
+      mannschaft_id: teamId,
+      name: 'Passspiel & Pressing',
+      datum: relDate(2),
+      phasen: [
+        { name: 'Aufwärmen', items: [{ uebung_id: passq.id, dauer_override: null, notiz: 'Locker starten, Fokus auf erstes Anbieten.' }] },
+        { name: 'Hauptteil', items: [
+          { uebung_id: passmuster.id, dauer_override: null, notiz: '' },
+          { uebung_id: fluegel.id, dauer_override: null, notiz: 'Beidseitig durchspielen.' }
+        ] },
+        { name: 'Spielform', items: [{ uebung_id: sechsv6.id, dauer_override: null, notiz: '' }] }
+      ],
+      notizen: 'Ausgleich für das ausgefallene Training letzte Woche.'
+    }];
+  }
+  fresh.spielzuege = getSeedSpielzuege(teamId);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(fresh));
+  return fresh;
+}
+
+function loadDb() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return seedDb();
+    const parsed = JSON.parse(raw);
+    return Object.assign({}, DEFAULT_DB, parsed);
+  } catch (e) {
+    console.error('DB-Load fehlgeschlagen, neu seeden:', e);
+    return seedDb();
+  }
+}
+
+function saveDb() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+}
+
+let db = loadDb();
+let editingSpielerId = null;
+let searchTerm = '';
+let editingTerminId = null;
+let pendingTermin = null;
+let terminFilter = 'kommend';
+let aufstellungenView = 'list';
+let editingAufstellungId = null;
+let selectedSlotIdx = null;
+let editingUebungId = null;
+let pendingUebung = null;
+let uebungSearch = '';
+let uebungKatFilter = 'alle';
+let trainingsplaeneView = 'list';
+let editingTrainingsplanId = null;
+let pickerCallback = null;
+let pickerSearch = '';
+let pickerKatFilter = 'alle';
+let itemEditCtx = null;
+let spielzuegeView = 'list';
+let editingSpielzugId = null;
+let szTool = 'select';
+let szSelectedElId = null;
+let szPfeilStart = null;
+let szDragging = null;
+let szAnimRunning = false;
+let szAnimRAF = null;
+let szAnimTimeout = null;
+let szListKatFilter = 'alle';
+let szCurrentPhase = 1;
+let szZoneColor = 'green';
+let szZoneDrawing = null;
+
+function getPfeilPhase(p, allPfeile) {
+  if (p.phase != null) return p.phase;
+  const idx = (allPfeile || []).indexOf(p);
+  return idx >= 0 ? idx + 1 : 1;
+}
+
+function getMaxPhase(sz) {
+  const pfeile = (sz.elemente || []).filter(e => e.type === 'pfeil');
+  if (pfeile.length === 0) return 0;
+  return Math.max.apply(null, pfeile.map(p => getPfeilPhase(p, pfeile)));
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem(THEME_KEY, theme);
+}
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
+
+const APP_MODE_KEY = 'welp_coach_app_mode';
+let appMode = (localStorage.getItem(APP_MODE_KEY) === 'kids') ? 'kids' : 'coach';
+document.documentElement.dataset.appMode = appMode;
+
+function updateModePills() {
+  document.querySelectorAll('.mode-pill').forEach(b => {
+    b.classList.toggle('active', b.dataset.mode === appMode);
+  });
+}
+
+function setAppMode(mode) {
+  if (mode !== 'kids' && mode !== 'coach') return;
+  if (mode === appMode) return;
+  if (typeof spielzuegeView !== 'undefined' && spielzuegeView === 'edit') closeSpielzugEditor();
+  if (typeof aufstellungenView !== 'undefined' && aufstellungenView === 'edit') closeAufstellungEditor();
+  if (typeof trainingsplaeneView !== 'undefined' && trainingsplaeneView === 'edit') closeTrainingsplanEditor();
+  document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  appMode = mode;
+  document.documentElement.dataset.appMode = mode;
+  localStorage.setItem(APP_MODE_KEY, mode);
+  updateModePills();
+
+  if (mode === 'kids') {
+    const activeTab = document.querySelector('.tab.active');
+    if (activeTab && (activeTab.dataset.tab === 'spieler' || activeTab.dataset.tab === 'aufstellungen')) {
+      const target = document.querySelector('.tab[data-tab="spielzuege"]');
+      if (target) target.click();
+      return;
+    }
+  }
+  const activeTab = document.querySelector('.tab.active');
+  if (activeTab && TAB_RENDERERS[activeTab.dataset.tab]) {
+    TAB_RENDERERS[activeTab.dataset.tab]();
+  }
+}
+
+document.getElementById('theme-toggle').onclick = () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+};
+
+const tabs = document.querySelectorAll('.tab');
+const tabContents = document.querySelectorAll('.tab-content');
+const TAB_RENDERERS = {};
+tabs.forEach(tab => {
+  tab.onclick = () => {
+    tabs.forEach(t => t.classList.toggle('active', t === tab));
+    tabContents.forEach(c => { c.hidden = c.id !== ('tab-' + tab.dataset.tab); });
+    const r = TAB_RENDERERS[tab.dataset.tab];
+    if (r) r();
+  };
+});
+
+function renderActiveTeam() {
+  const team = db.mannschaften.find(t => t.id === db.meta.active_mannschaft_id);
+  document.getElementById('active-team-display').textContent = team ? (team.name + ' · ' + team.saison) : '';
+}
+
+function getActiveSpieler() {
+  return db.spieler.filter(s => s.mannschaft_id === db.meta.active_mannschaft_id);
+}
+
+function renderSpielerTab() {
+  const list = getActiveSpieler();
+  const q = searchTerm.toLowerCase().trim();
+  const filtered = q
+    ? list.filter(s => (s.vorname + ' ' + s.nachname + ' ' + s.position + ' ' + s.trikotnummer).toLowerCase().includes(q))
+    : list.slice();
+  filtered.sort((a, b) => a.trikotnummer - b.trikotnummer);
+
+  const fit = list.filter(s => s.status === 'fit').length;
+  const out = list.filter(s => s.status === 'krank' || s.status === 'verletzt').length;
+
+  const container = document.getElementById('tab-spieler');
+  const tableHtml = filtered.length === 0
+    ? '<div class="empty"><p>Keine Spieler' + (q ? ' für diese Suche' : '') + '.</p>' +
+      (q ? '' : '<p>Über "+ Spieler hinzufügen" oben legst du deinen ersten Kader an.</p>') +
+      '</div>'
+    : '<table>' +
+      '<thead><tr>' +
+        '<th style="width:60px;">Nr.</th>' +
+        '<th>Name</th>' +
+        '<th style="width:80px;">Pos.</th>' +
+        '<th style="width:80px;">Geb.</th>' +
+        '<th style="width:110px;">Status</th>' +
+        '<th style="width:80px;"></th>' +
+      '</tr></thead>' +
+      '<tbody>' +
+      filtered.map(s =>
+        '<tr data-id="' + esc(s.id) + '">' +
+          '<td>' + esc(s.trikotnummer) + '</td>' +
+          '<td>' + esc(s.vorname) + ' ' + esc(s.nachname) +
+            (s.ist_kapitaen ? '<span class="badge badge-cap" title="Kapitän">©</span>' : '') +
+          '</td>' +
+          '<td><span class="pos-pill">' + esc(s.position) + '</span></td>' +
+          '<td>' + esc(s.geburtsjahr) + '</td>' +
+          '<td><span class="badge badge-' + esc(s.status) + '">' + esc(STATUS_LABEL[s.status] || s.status) + '</span></td>' +
+          '<td><div class="row-actions"><button class="icon-btn" data-edit="' + esc(s.id) + '" title="Bearbeiten">✎</button></div></td>' +
+        '</tr>'
+      ).join('') +
+      '</tbody></table>';
+
+  container.innerHTML =
+    '<div class="stats">' +
+      '<div class="stat"><div class="stat-label">Kader</div><div class="stat-value">' + list.length + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Fit</div><div class="stat-value" style="color:var(--accent-text);">' + fit + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Ausfälle</div><div class="stat-value" style="color:var(--danger-text);">' + out + '</div></div>' +
+    '</div>' +
+    '<div class="toolbar">' +
+      '<input type="text" class="search" id="spieler-search" placeholder="Suchen nach Name, Position, Nummer …" value="' + esc(searchTerm) + '">' +
+      '<button class="btn btn-primary" id="spieler-add">+ Spieler hinzufügen</button>' +
+    '</div>' +
+    tableHtml;
+
+  const searchEl = document.getElementById('spieler-search');
+  searchEl.oninput = (e) => {
+    searchTerm = e.target.value;
+    renderSpielerTab();
+    const focused = document.getElementById('spieler-search');
+    if (focused) {
+      focused.focus();
+      focused.setSelectionRange(focused.value.length, focused.value.length);
+    }
+  };
+  document.getElementById('spieler-add').onclick = () => openSpielerModal();
+  container.querySelectorAll('tbody tr').forEach(tr => {
+    tr.onclick = (e) => {
+      const editBtn = e.target.closest('[data-edit]');
+      const id = editBtn ? editBtn.dataset.edit : tr.dataset.id;
+      openSpielerModal(id);
+    };
+  });
+}
+
+function openSpielerModal(id) {
+  editingSpielerId = id || null;
+  const isEdit = !!id;
+  const data = isEdit
+    ? db.spieler.find(s => s.id === id)
+    : mkSpieler(db.meta.active_mannschaft_id, {});
+
+  document.getElementById('modal-title').textContent = isEdit ? 'Spieler bearbeiten' : 'Spieler hinzufügen';
+  document.getElementById('modal-delete').style.visibility = isEdit ? 'visible' : 'hidden';
+
+  document.getElementById('modal-body').innerHTML =
+    '<div class="form-row"><label for="f-trikotnummer">Trikotnummer</label>' +
+      '<input type="number" id="f-trikotnummer" min="1" max="99" value="' + esc(data.trikotnummer || '') + '" required></div>' +
+    '<div class="form-row"><label for="f-vorname">Vorname</label>' +
+      '<input type="text" id="f-vorname" value="' + esc(data.vorname) + '" required></div>' +
+    '<div class="form-row"><label for="f-nachname">Nachname</label>' +
+      '<input type="text" id="f-nachname" value="' + esc(data.nachname) + '" required></div>' +
+    '<div class="form-row"><label for="f-position">Position</label>' +
+      '<select id="f-position">' +
+      POSITIONEN.map(p => '<option ' + (data.position === p ? 'selected' : '') + '>' + p + '</option>').join('') +
+      '</select></div>' +
+    '<div class="form-row"><label for="f-geburtsjahr">Geburtsjahr</label>' +
+      '<input type="number" id="f-geburtsjahr" min="1990" max="' + new Date().getFullYear() + '" value="' + esc(data.geburtsjahr) + '"></div>' +
+    '<div class="form-row"><label for="f-status">Status</label>' +
+      '<select id="f-status">' +
+      STATUS_LIST.map(s => '<option value="' + s + '" ' + (data.status === s ? 'selected' : '') + '>' + STATUS_LABEL[s] + '</option>').join('') +
+      '</select></div>' +
+    '<div class="form-row"><label>Kapitän</label>' +
+      '<div class="inline-check"><input type="checkbox" id="f-kapitaen" ' + (data.ist_kapitaen ? 'checked' : '') + '>' +
+      '<label for="f-kapitaen">Spielführer dieser Mannschaft</label></div></div>' +
+    '<div class="form-row"><label for="f-eltern">Eltern-Kontakt</label>' +
+      '<input type="text" id="f-eltern" value="' + esc(data.eltern_kontakt) + '" placeholder="z.B. Klaus Krüger · 0171 …"></div>' +
+    '<div class="form-row"><label for="f-notizen">Notizen</label>' +
+      '<textarea id="f-notizen" placeholder="Entwicklungsziele, Beobachtungen …">' + esc(data.notizen) + '</textarea></div>';
+
+  document.getElementById('spieler-modal').classList.add('open');
+  setTimeout(() => document.getElementById('f-trikotnummer').focus(), 50);
+}
+
+function closeSpielerModal() {
+  document.getElementById('spieler-modal').classList.remove('open');
+  editingSpielerId = null;
+}
+
+function saveSpielerModal() {
+  const g = (id) => document.getElementById(id);
+  const data = {
+    trikotnummer: parseInt(g('f-trikotnummer').value, 10),
+    vorname: g('f-vorname').value.trim(),
+    nachname: g('f-nachname').value.trim(),
+    position: g('f-position').value,
+    geburtsjahr: parseInt(g('f-geburtsjahr').value, 10) || (new Date().getFullYear() - 14),
+    status: g('f-status').value,
+    ist_kapitaen: g('f-kapitaen').checked,
+    eltern_kontakt: g('f-eltern').value.trim(),
+    notizen: g('f-notizen').value.trim()
+  };
+
+  if (!data.vorname || !data.nachname || !data.trikotnummer) {
+    alert('Trikotnummer, Vorname und Nachname sind Pflicht.');
+    return;
+  }
+
+  if (editingSpielerId) {
+    const existing = db.spieler.find(s => s.id === editingSpielerId);
+    Object.assign(existing, data);
+  } else {
+    db.spieler.push(mkSpieler(db.meta.active_mannschaft_id, data));
+  }
+  saveDb();
+  renderSpielerTab();
+  closeSpielerModal();
+}
+
+function deleteSpielerModal() {
+  if (!editingSpielerId) return;
+  const s = db.spieler.find(x => x.id === editingSpielerId);
+  if (!s) return;
+  if (!confirm('Spieler "' + s.vorname + ' ' + s.nachname + '" wirklich löschen?')) return;
+  db.spieler = db.spieler.filter(x => x.id !== editingSpielerId);
+  saveDb();
+  renderSpielerTab();
+  closeSpielerModal();
+}
+
+function getActiveTermine() {
+  return db.termine.filter(t => t.mannschaft_id === db.meta.active_mannschaft_id);
+}
+
+function renderTermineTab() {
+  const all = getActiveTermine();
+  const upcoming = all.filter(t => !isPastDate(t.datum));
+  const past = all.filter(t => isPastDate(t.datum));
+
+  let visible;
+  if (terminFilter === 'kommend') {
+    visible = upcoming.slice().sort((a, b) => a.datum.localeCompare(b.datum) || a.uhrzeit_start.localeCompare(b.uhrzeit_start));
+  } else if (terminFilter === 'vergangen') {
+    visible = past.slice().sort((a, b) => b.datum.localeCompare(a.datum));
+  } else {
+    visible = all.slice().sort((a, b) => b.datum.localeCompare(a.datum));
+  }
+
+  const next = upcoming.slice().sort((a, b) => a.datum.localeCompare(b.datum))[0];
+  const nextLabel = next ? formatDateDE(next.datum) : '–';
+
+  const container = document.getElementById('tab-termine');
+  const listHtml = visible.length === 0
+    ? '<div class="empty"><p>Keine Termine' + (terminFilter !== 'alle' ? ' (' + terminFilter + ')' : '') + '.</p></div>'
+    : '<div class="termin-list">' + visible.map(renderTerminCard).join('') + '</div>';
+
+  container.innerHTML =
+    '<div class="stats">' +
+      '<div class="stat"><div class="stat-label">Kommend</div><div class="stat-value">' + upcoming.length + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Vergangen</div><div class="stat-value">' + past.length + '</div></div>' +
+      '<div class="stat"><div class="stat-label">Nächster</div><div class="stat-value" style="font-size:14px;font-weight:500;">' + esc(nextLabel) + '</div></div>' +
+    '</div>' +
+    '<div class="toolbar">' +
+      '<div class="filter-pills">' +
+        '<button class="filter-pill ' + (terminFilter === 'kommend' ? 'active' : '') + '" data-tfilter="kommend">Kommend</button>' +
+        '<button class="filter-pill ' + (terminFilter === 'vergangen' ? 'active' : '') + '" data-tfilter="vergangen">Vergangen</button>' +
+        '<button class="filter-pill ' + (terminFilter === 'alle' ? 'active' : '') + '" data-tfilter="alle">Alle</button>' +
+      '</div>' +
+      '<div style="flex:1;"></div>' +
+      '<button class="btn btn-primary" id="termin-add">+ Termin hinzufügen</button>' +
+    '</div>' +
+    listHtml;
+
+  container.querySelectorAll('[data-tfilter]').forEach(btn => {
+    btn.onclick = () => { terminFilter = btn.dataset.tfilter; renderTermineTab(); };
+  });
+  document.getElementById('termin-add').onclick = () => openTerminModal();
+  container.querySelectorAll('[data-termin-id]').forEach(card => {
+    card.onclick = () => openTerminModal(card.dataset.terminId);
+  });
+}
+
+function renderTerminCard(t) {
+  const d = parseISODate(t.datum);
+  const day = d ? d.getDate() : '?';
+  const month = d ? MONATE_KURZ[d.getMonth()] : '';
+  const past = isPastDate(t.datum);
+
+  const counts = { zugesagt: 0, fraglich: 0, abgesagt: 0, unbekannt: 0 };
+  (t.anwesenheit || []).forEach(a => { if (counts[a.status] != null) counts[a.status]++; });
+
+  const time = t.uhrzeit_start + (t.uhrzeit_ende ? '–' + t.uhrzeit_ende : '');
+  const ortLabel = t.typ === 'spiel'
+    ? (t.heimspiel ? 'Heim' : 'Auswärts') + (t.ort ? ' · ' + t.ort : '')
+    : t.ort;
+
+  let awStr = '<strong>' + counts.zugesagt + '</strong> zugesagt';
+  if (counts.fraglich) awStr += ' · ' + counts.fraglich + ' fraglich';
+  if (counts.abgesagt) awStr += ' · ' + counts.abgesagt + ' abgesagt';
+  if (counts.unbekannt && !past) awStr += ' · ' + counts.unbekannt + ' offen';
+
+  return '<div class="termin-card ' + (past ? 'past' : '') + '" data-termin-id="' + esc(t.id) + '">' +
+    '<div class="termin-date">' +
+      '<span class="termin-date-d">' + day + '</span>' +
+      '<span class="termin-date-m">' + esc(month) + '</span>' +
+    '</div>' +
+    '<div class="termin-body">' +
+      '<div class="termin-titel">' +
+        '<span class="termin-typ-badge termin-typ-' + esc(t.typ) + '">' + esc(TYP_LABEL[t.typ] || t.typ) + '</span>' +
+        esc(t.titel || '(ohne Titel)') +
+      '</div>' +
+      '<div class="termin-meta">' +
+        '<span>' + esc(time) + '</span>' +
+        (ortLabel ? '<span>' + esc(ortLabel) + '</span>' : '') +
+      '</div>' +
+    '</div>' +
+    '<div class="termin-aw">' + awStr + '</div>' +
+  '</div>';
+}
+
+function openTerminModal(id) {
+  editingTerminId = id || null;
+  const isEdit = !!id;
+  if (isEdit) {
+    const orig = db.termine.find(t => t.id === id);
+    if (!orig) return;
+    pendingTermin = JSON.parse(JSON.stringify(orig));
+  } else {
+    pendingTermin = mkTermin(db.meta.active_mannschaft_id, {});
+  }
+
+  document.getElementById('termin-modal-title').textContent = isEdit ? 'Termin bearbeiten' : 'Termin hinzufügen';
+  document.getElementById('termin-modal-delete').style.visibility = isEdit ? 'visible' : 'hidden';
+
+  const body = document.getElementById('termin-modal-body');
+  body.innerHTML =
+    '<div class="form-row"><label for="t-typ">Art</label>' +
+      '<select id="t-typ">' +
+      TYP_LIST.map(t => '<option value="' + t + '" ' + (pendingTermin.typ === t ? 'selected' : '') + '>' + TYP_LABEL[t] + '</option>').join('') +
+      '</select></div>' +
+    '<div class="form-row"><label for="t-datum">Datum</label>' +
+      '<input type="date" id="t-datum" value="' + esc(pendingTermin.datum) + '" required></div>' +
+    '<div class="form-row"><label for="t-uhrzeit-start">Uhrzeit</label>' +
+      '<div style="display:flex; gap:6px; align-items:center;">' +
+        '<input type="time" id="t-uhrzeit-start" value="' + esc(pendingTermin.uhrzeit_start) + '" required style="flex:0 1 auto;">' +
+        '<span style="color: var(--text-2); font-size: 12px;">bis</span>' +
+        '<input type="time" id="t-uhrzeit-ende" value="' + esc(pendingTermin.uhrzeit_ende) + '" style="flex:0 1 auto;">' +
+      '</div></div>' +
+    '<div class="form-row"><label for="t-titel">Titel</label>' +
+      '<input type="text" id="t-titel" value="' + esc(pendingTermin.titel) + '" placeholder="z.B. Passspiel & Pressing" required></div>' +
+    '<div class="form-row"><label for="t-ort">Ort</label>' +
+      '<input type="text" id="t-ort" value="' + esc(pendingTermin.ort) + '" placeholder="z.B. Platz 2"></div>' +
+    '<div class="conditional-row" id="row-gegner"><label for="t-gegner">Gegner</label>' +
+      '<input type="text" id="t-gegner" value="' + esc(pendingTermin.gegner) + '" placeholder="z.B. FC Nachbar"></div>' +
+    '<div class="conditional-row" id="row-heim"><label>Heim/Auswärts</label>' +
+      '<div class="inline-check">' +
+        '<input type="checkbox" id="t-heim" ' + (pendingTermin.heimspiel ? 'checked' : '') + '>' +
+        '<label for="t-heim">Heimspiel</label>' +
+      '</div></div>' +
+    '<div class="form-row"><label for="t-notizen">Notizen</label>' +
+      '<textarea id="t-notizen" placeholder="Fokus, Ergebnis, Bemerkungen …">' + esc(pendingTermin.notizen) + '</textarea></div>' +
+    renderAnwesenheitInModal(pendingTermin);
+
+  function updateConditional() {
+    const showSpiel = document.getElementById('t-typ').value === 'spiel';
+    document.getElementById('row-gegner').classList.toggle('hidden', !showSpiel);
+    document.getElementById('row-heim').classList.toggle('hidden', !showSpiel);
+  }
+  updateConditional();
+  document.getElementById('t-typ').onchange = updateConditional;
+
+  attachAwHandlers(body);
+  document.getElementById('termin-modal').classList.add('open');
+  setTimeout(() => { const el = document.getElementById('t-titel'); if (el) el.focus(); }, 50);
+}
+
+function renderAnwesenheitInModal(termin) {
+  const teamSp = (db.spieler || []).filter(s => s.mannschaft_id === termin.mannschaft_id);
+  teamSp.sort((a, b) => a.trikotnummer - b.trikotnummer);
+
+  if (!termin.anwesenheit) termin.anwesenheit = [];
+  teamSp.forEach(s => {
+    if (!termin.anwesenheit.find(a => a.spieler_id === s.id)) {
+      termin.anwesenheit.push({ spieler_id: s.id, status: 'unbekannt' });
+    }
+  });
+
+  const awMap = {};
+  termin.anwesenheit.forEach(a => { awMap[a.spieler_id] = a.status; });
+
+  const counts = { zugesagt: 0, fraglich: 0, abgesagt: 0, unbekannt: 0 };
+  teamSp.forEach(s => {
+    const st = awMap[s.id] || 'unbekannt';
+    if (counts[st] != null) counts[st]++;
+  });
+
+  if (teamSp.length === 0) {
+    return '<div class="anwesenheit-section"><p style="font-size: 12px; color: var(--text-2); margin: 0;">Noch keine Spieler im Kader.</p></div>';
+  }
+
+  return '<div class="anwesenheit-section">' +
+    '<div class="anwesenheit-head">' +
+      '<p class="anwesenheit-title">Anwesenheit (' + teamSp.length + ')</p>' +
+      '<span class="anwesenheit-summary">' +
+        counts.zugesagt + ' zu · ' + counts.fraglich + ' fr · ' + counts.abgesagt + ' ab · ' + counts.unbekannt + ' offen' +
+      '</span>' +
+    '</div>' +
+    '<div class="anwesenheit-list">' +
+    teamSp.map(s => {
+      const st = awMap[s.id] || 'unbekannt';
+      return '<div class="aw-row">' +
+        '<span class="aw-num">' + esc(s.trikotnummer) + '</span>' +
+        '<span class="aw-name">' + esc(s.vorname) + ' ' + esc(s.nachname) + '</span>' +
+        '<span class="aw-pos">' + esc(s.position) + '</span>' +
+        '<div class="aw-buttons">' +
+          '<button type="button" class="aw-btn aw-zu ' + (st === 'zugesagt' ? 'active' : '') + '" data-spieler-id="' + esc(s.id) + '" data-status="zugesagt" title="Zugesagt">✓</button>' +
+          '<button type="button" class="aw-btn aw-fr ' + (st === 'fraglich' ? 'active' : '') + '" data-spieler-id="' + esc(s.id) + '" data-status="fraglich" title="Fraglich">?</button>' +
+          '<button type="button" class="aw-btn aw-ab ' + (st === 'abgesagt' ? 'active' : '') + '" data-spieler-id="' + esc(s.id) + '" data-status="abgesagt" title="Abgesagt">×</button>' +
+        '</div>' +
+      '</div>';
+    }).join('') +
+    '</div>' +
+  '</div>';
+}
+
+function attachAwHandlers(body) {
+  body.querySelectorAll('.aw-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const spielerId = btn.dataset.spielerId;
+      const status = btn.dataset.status;
+      const aw = (pendingTermin.anwesenheit || []).find(a => a.spieler_id === spielerId);
+      if (!aw) return;
+      if (aw.status === status) {
+        aw.status = 'unbekannt';
+        btn.classList.remove('active');
+      } else {
+        aw.status = status;
+        btn.parentElement.querySelectorAll('.aw-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      updateAwSummary();
+    };
+  });
+}
+
+function updateAwSummary() {
+  const counts = { zugesagt: 0, fraglich: 0, abgesagt: 0, unbekannt: 0 };
+  (pendingTermin.anwesenheit || []).forEach(a => { if (counts[a.status] != null) counts[a.status]++; });
+  const sumEl = document.querySelector('#termin-modal .anwesenheit-summary');
+  if (sumEl) {
+    sumEl.textContent = counts.zugesagt + ' zu · ' + counts.fraglich + ' fr · ' + counts.abgesagt + ' ab · ' + counts.unbekannt + ' offen';
+  }
+}
+
+function closeTerminModal() {
+  document.getElementById('termin-modal').classList.remove('open');
+  editingTerminId = null;
+  pendingTermin = null;
+}
+
+function saveTerminModal() {
+  const g = (id) => document.getElementById(id);
+  const typ = g('t-typ').value;
+  pendingTermin.typ = typ;
+  pendingTermin.datum = g('t-datum').value;
+  pendingTermin.uhrzeit_start = g('t-uhrzeit-start').value;
+  pendingTermin.uhrzeit_ende = g('t-uhrzeit-ende').value;
+  pendingTermin.titel = g('t-titel').value.trim();
+  pendingTermin.ort = g('t-ort').value.trim();
+  pendingTermin.gegner = typ === 'spiel' ? g('t-gegner').value.trim() : '';
+  pendingTermin.heimspiel = typ === 'spiel' ? g('t-heim').checked : true;
+  pendingTermin.notizen = g('t-notizen').value.trim();
+
+  if (!pendingTermin.datum || !pendingTermin.uhrzeit_start || !pendingTermin.titel) {
+    alert('Datum, Startzeit und Titel sind Pflicht.');
+    return;
+  }
+
+  if (editingTerminId) {
+    const idx = db.termine.findIndex(t => t.id === editingTerminId);
+    if (idx >= 0) db.termine[idx] = pendingTermin;
+  } else {
+    db.termine.push(pendingTermin);
+  }
+  saveDb();
+  renderTermineTab();
+  closeTerminModal();
+}
+
+function deleteTerminModal() {
+  if (!editingTerminId) return;
+  const t = db.termine.find(x => x.id === editingTerminId);
+  if (!t) return;
+  if (!confirm('Termin "' + (t.titel || formatDateDE(t.datum)) + '" wirklich löschen?')) return;
+  db.termine = db.termine.filter(x => x.id !== editingTerminId);
+  saveDb();
+  renderTermineTab();
+  closeTerminModal();
+}
+
+document.getElementById('termin-modal-close').onclick = closeTerminModal;
+document.getElementById('termin-modal-cancel').onclick = closeTerminModal;
+document.getElementById('termin-modal-save').onclick = saveTerminModal;
+document.getElementById('termin-modal-delete').onclick = deleteTerminModal;
+document.getElementById('termin-modal').onclick = (e) => {
+  if (e.target.id === 'termin-modal') closeTerminModal();
+};
+
+function getActiveAufstellungen() {
+  return db.aufstellungen.filter(a => a.mannschaft_id === db.meta.active_mannschaft_id);
+}
+
+function renderAufstellungenTab() {
+  if (aufstellungenView === 'edit' && editingAufstellungId) {
+    renderAufstellungEditor();
+  } else {
+    renderAufstellungenList();
+  }
+}
+
+function renderAufstellungenList() {
+  const list = getActiveAufstellungen();
+  const container = document.getElementById('tab-aufstellungen');
+
+  const cardsHtml = list.length === 0
+    ? '<div class="empty"><p>Noch keine Aufstellungen.</p><p style="font-size:12px;">Lege eine neue an, um die Taktiktafel zu öffnen.</p></div>'
+    : '<div class="aufst-list-grid">' + list.map(a => {
+        const f = FORMATIONS[a.formation] || [];
+        const filled = Object.keys(a.positionen || {}).length;
+        return '<div class="aufst-list-card" data-aufst-id="' + esc(a.id) + '">' +
+          '<p class="aufst-list-card-name">' + esc(a.name) + '</p>' +
+          '<div class="aufst-list-card-badges">' +
+            '<span class="aufst-form-badge">' + esc(a.formation) + '</span>' +
+            '<span class="aufst-var-badge">' + esc(a.variante) + '</span>' +
+          '</div>' +
+          '<div class="aufst-list-card-info">' + filled + '/' + f.length + ' Spieler positioniert</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  container.innerHTML =
+    '<div class="toolbar">' +
+      '<div style="font-size: 13px; color: var(--text-2);">' + list.length + ' Aufstellung' + (list.length === 1 ? '' : 'en') + '</div>' +
+      '<div style="flex:1;"></div>' +
+      '<button class="btn btn-primary" id="aufst-add">+ Aufstellung hinzufügen</button>' +
+    '</div>' +
+    cardsHtml;
+
+  document.getElementById('aufst-add').onclick = () => {
+    const fresh = mkAufstellung(db.meta.active_mannschaft_id, {});
+    db.aufstellungen.push(fresh);
+    saveDb();
+    openAufstellungEditor(fresh.id);
+  };
+  container.querySelectorAll('[data-aufst-id]').forEach(card => {
+    card.onclick = () => openAufstellungEditor(card.dataset.aufstId);
+  });
+}
+
+function openAufstellungEditor(id) {
+  editingAufstellungId = id;
+  selectedSlotIdx = null;
+  aufstellungenView = 'edit';
+  renderAufstellungenTab();
+}
+
+function closeAufstellungEditor() {
+  aufstellungenView = 'list';
+  editingAufstellungId = null;
+  selectedSlotIdx = null;
+  renderAufstellungenTab();
+}
+
+function renderAufstellungEditor() {
+  const a = db.aufstellungen.find(x => x.id === editingAufstellungId);
+  if (!a) { closeAufstellungEditor(); return; }
+  const formationSlots = FORMATIONS[a.formation] || [];
+  const pos = a.positionen || {};
+
+  const spielerToSlot = {};
+  Object.keys(pos).forEach(k => { spielerToSlot[pos[k]] = parseInt(k, 10); });
+
+  const teamSp = db.spieler.filter(s => s.mannschaft_id === a.mannschaft_id);
+  teamSp.sort((x, y) => x.trikotnummer - y.trikotnummer);
+
+  const filledCount = Object.keys(pos).length;
+  const pitchSvg = renderPitchSvg(formationSlots, pos, teamSp);
+
+  const kaderHtml = teamSp.length === 0
+    ? '<p style="font-size: 12px; color: var(--text-3); padding: 6px;">Noch keine Spieler im Kader.</p>'
+    : teamSp.map(s => {
+        const slot = spielerToSlot[s.id];
+        const placed = slot != null;
+        const slotLabel = placed ? formationSlots[slot].label : '';
+        return '<div class="kader-card ' + (placed ? 'placed' : '') + '" data-spieler-id="' + esc(s.id) + '">' +
+          '<span class="kader-num">' + esc(s.trikotnummer) + '</span>' +
+          '<span class="kader-name">' + esc(s.vorname) + ' ' + esc(s.nachname) + '</span>' +
+          (placed
+            ? '<span class="kader-slot-badge">' + esc(slotLabel) + '</span>'
+            : '<span class="kader-pos">' + esc(s.position) + '</span>') +
+        '</div>';
+      }).join('');
+
+  const instruction = selectedSlotIdx != null
+    ? 'Spieler aus dem Kader wählen → wird auf <strong>' + esc(formationSlots[selectedSlotIdx].label) + '</strong> gesetzt'
+    : 'Position auf der Taktiktafel klicken, dann Spieler aus dem Kader wählen';
+
+  const container = document.getElementById('tab-aufstellungen');
+  container.innerHTML =
+    '<div class="aufst-editor-top">' +
+      '<button class="aufst-back-btn" id="aufst-back">← Aufstellungen</button>' +
+      '<input type="text" id="aufst-name" value="' + esc(a.name) + '" placeholder="Name">' +
+      '<select id="aufst-formation" title="Formation">' +
+        FORMATION_NAMES.map(f => '<option value="' + f + '" ' + (a.formation === f ? 'selected' : '') + '>' + f + '</option>').join('') +
+      '</select>' +
+      '<select id="aufst-variante" title="Variante">' +
+        VARIANTEN.map(v => '<option value="' + v + '" ' + (a.variante === v ? 'selected' : '') + '>' + v + '</option>').join('') +
+      '</select>' +
+      '<div class="aufst-spacer"></div>' +
+      '<div class="aufst-count"><strong>' + filledCount + '</strong>/' + formationSlots.length + '</div>' +
+      '<button class="btn btn-danger" id="aufst-delete">Löschen</button>' +
+    '</div>' +
+    '<div class="aufst-layout">' +
+      '<div class="aufst-pitch-wrap">' +
+        '<div class="aufst-instruction ' + (selectedSlotIdx != null ? 'active' : '') + '">' + instruction + '</div>' +
+        pitchSvg +
+      '</div>' +
+      '<div class="aufst-sidebar">' +
+        '<p class="aufst-sidebar-h">Kader (' + teamSp.length + ')</p>' +
+        '<div class="kader-list">' + kaderHtml + '</div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('aufst-back').onclick = closeAufstellungEditor;
+  document.getElementById('aufst-delete').onclick = () => {
+    if (!confirm('Aufstellung "' + a.name + '" wirklich löschen?')) return;
+    db.aufstellungen = db.aufstellungen.filter(x => x.id !== a.id);
+    saveDb();
+    closeAufstellungEditor();
+  };
+
+  const nameEl = document.getElementById('aufst-name');
+  nameEl.onblur = () => {
+    const v = nameEl.value.trim() || 'Unbenannt';
+    if (v !== a.name) { a.name = v; saveDb(); }
+  };
+
+  document.getElementById('aufst-formation').onchange = (e) => {
+    const newFormation = e.target.value;
+    if (filledCount > 0 && !confirm('Aktuelle Spieler-Positionen werden zurückgesetzt. Formation auf ' + newFormation + ' wechseln?')) {
+      e.target.value = a.formation;
+      return;
+    }
+    a.formation = newFormation;
+    a.positionen = {};
+    selectedSlotIdx = null;
+    saveDb();
+    renderAufstellungenTab();
+  };
+
+  document.getElementById('aufst-variante').onchange = (e) => {
+    a.variante = e.target.value;
+    saveDb();
+  };
+
+  container.querySelectorAll('[data-slot-idx]').forEach(g => {
+    g.onclick = () => {
+      const idx = parseInt(g.dataset.slotIdx, 10);
+      selectedSlotIdx = (selectedSlotIdx === idx) ? null : idx;
+      renderAufstellungenTab();
+    };
+  });
+
+  container.querySelectorAll('.kader-card').forEach(c => {
+    c.onclick = () => {
+      const spId = c.dataset.spielerId;
+      const currentSlot = spielerToSlot[spId];
+      if (selectedSlotIdx != null) {
+        if (currentSlot != null) delete a.positionen[currentSlot];
+        a.positionen[selectedSlotIdx] = spId;
+        selectedSlotIdx = null;
+        saveDb();
+        renderAufstellungenTab();
+      } else if (currentSlot != null) {
+        const sp = db.spieler.find(s => s.id === spId);
+        if (confirm((sp ? sp.vorname + ' ' + sp.nachname : 'Spieler') + ' aus der Aufstellung nehmen?')) {
+          delete a.positionen[currentSlot];
+          saveDb();
+          renderAufstellungenTab();
+        }
+      }
+    };
+  });
+}
+
+function renderPitchSvg(slots, positionen, teamSp) {
+  const spielerById = {};
+  teamSp.forEach(s => { spielerById[s.id] = s; });
+
+  const slotsMarkup = slots.map((slot, i) => {
+    const spId = positionen[i];
+    const sp = spId ? spielerById[spId] : null;
+    const filled = !!sp;
+    const selected = selectedSlotIdx === i;
+    const cls = ['pitch-slot'];
+    cls.push(filled ? 'filled' : 'empty');
+    if (selected) cls.push('selected');
+
+    const inner = filled
+      ? '<text class="slot-num">' + esc(sp.trikotnummer) + '</text>' +
+        '<text class="slot-label" y="10.5">' + esc(sp.nachname.length > 9 ? sp.nachname.slice(0, 8) + '.' : sp.nachname) + '</text>'
+      : '<text class="slot-plus">+</text>' +
+        '<text class="slot-label" y="10.5">' + esc(slot.label) + '</text>';
+
+    return '<g class="' + cls.join(' ') + '" data-slot-idx="' + i + '" transform="translate(' + slot.x + ',' + slot.y + ')">' +
+      '<circle r="6" />' +
+      inner +
+    '</g>';
+  }).join('');
+
+  return '<svg viewBox="0 0 100 150" class="pitch-svg" preserveAspectRatio="xMidYMid meet">' +
+    '<defs>' +
+      '<linearGradient id="pitch-grad" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="#5e8c1f"/>' +
+        '<stop offset="1" stop-color="#4a7117"/>' +
+      '</linearGradient>' +
+      '<pattern id="pitch-stripes" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">' +
+        '<rect width="100" height="20" fill="url(#pitch-grad)"/>' +
+        '<rect y="0" width="100" height="10" fill="rgba(255,255,255,0.04)"/>' +
+      '</pattern>' +
+    '</defs>' +
+    '<rect width="100" height="150" fill="url(#pitch-stripes)"/>' +
+    '<g stroke="white" stroke-width="0.35" fill="none" opacity="0.7" stroke-linejoin="round">' +
+      '<rect x="1" y="1" width="98" height="148" />' +
+      '<line x1="1" y1="75" x2="99" y2="75" />' +
+      '<circle cx="50" cy="75" r="10" />' +
+      '<circle cx="50" cy="75" r="0.6" fill="white" stroke="none"/>' +
+      '<rect x="22" y="1" width="56" height="20" />' +
+      '<rect x="36" y="1" width="28" height="7" />' +
+      '<path d="M 38 21 A 12 12 0 0 0 62 21" />' +
+      '<rect x="22" y="129" width="56" height="20" />' +
+      '<rect x="36" y="142" width="28" height="7" />' +
+      '<path d="M 38 129 A 12 12 0 0 1 62 129" />' +
+    '</g>' +
+    '<g>' + slotsMarkup + '</g>' +
+  '</svg>';
+}
+
+function renderUebungenTab() {
+  const all = (db.uebungen || []).slice();
+  const q = uebungSearch.toLowerCase().trim();
+
+  let filtered = uebungKatFilter === 'alle' ? all : all.filter(u => u.kategorie === uebungKatFilter);
+  if (q) {
+    filtered = filtered.filter(u => (u.name + ' ' + (u.beschreibung || '') + ' ' + (u.materialien || []).join(' ')).toLowerCase().includes(q));
+  }
+  filtered.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  const katCounts = { alle: all.length };
+  UEBUNG_KATEGORIEN.forEach(k => { katCounts[k] = all.filter(u => u.kategorie === k).length; });
+
+  const container = document.getElementById('tab-uebungen');
+  const emptyHtml = q || uebungKatFilter !== 'alle'
+    ? '<div class="empty"><p>Keine Übungen gefunden.</p><p style="font-size:12px;">Filter zurücksetzen oder neue Übung anlegen.</p></div>'
+    : '<div class="empty"><p>Noch keine Übungen.</p><p style="font-size:12px;">Du kannst eigene anlegen oder die mitgelieferten Beispiele laden.</p><button class="btn btn-primary" id="uebung-load-examples" style="margin-top: 14px;">8 Beispiel-Übungen laden</button></div>';
+  const gridHtml = filtered.length === 0 ? emptyHtml : '<div class="uebung-grid">' + filtered.map(renderUebungCard).join('') + '</div>';
+
+  const seedNamesLower = getSeedUebungen().map(u => u.name.toLowerCase());
+  const existingNamesLower = new Set((db.uebungen || []).map(u => u.name.toLowerCase()));
+  const missingSeeds = seedNamesLower.filter(n => !existingNamesLower.has(n)).length;
+  const toolbarLoadBtn = missingSeeds > 0
+    ? '<button class="btn" id="uebung-load-examples-toolbar" title="Mitgelieferte Beispiel-Übungen ergänzen">+ ' + missingSeeds + ' Beispiele laden</button>'
+    : '';
+
+  container.innerHTML =
+    '<div class="toolbar">' +
+      '<input type="search" id="uebung-search" placeholder="Übungen durchsuchen …" value="' + esc(uebungSearch) + '" style="flex: 0 1 280px; padding: 7px 10px; background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: inherit; font-size: 13px; color: var(--text);">' +
+      '<div style="flex:1;"></div>' +
+      toolbarLoadBtn +
+      '<button class="btn btn-primary" id="uebung-add">+ Übung hinzufügen</button>' +
+    '</div>' +
+    '<div class="filter-pills" style="margin-bottom: 14px;">' +
+      '<button class="filter-pill ' + (uebungKatFilter === 'alle' ? 'active' : '') + '" data-katfilter="alle">Alle (' + katCounts.alle + ')</button>' +
+      UEBUNG_KATEGORIEN.map(k =>
+        '<button class="filter-pill ' + (uebungKatFilter === k ? 'active' : '') + '" data-katfilter="' + k + '">' + UEBUNG_KAT_LABEL[k] + ' (' + katCounts[k] + ')</button>'
+      ).join('') +
+    '</div>' +
+    gridHtml;
+
+  const searchEl = document.getElementById('uebung-search');
+  searchEl.oninput = () => { uebungSearch = searchEl.value; renderUebungenTab(); };
+  searchEl.onfocus = () => searchEl.setSelectionRange(searchEl.value.length, searchEl.value.length);
+  if (q) setTimeout(() => searchEl.focus(), 0);
+
+  document.getElementById('uebung-add').onclick = () => openUebungModal();
+  const loadSeedsFn = () => {
+    const existing = new Set((db.uebungen || []).map(u => u.name.toLowerCase()));
+    const seeds = getSeedUebungen().filter(u => !existing.has(u.name.toLowerCase()));
+    if (seeds.length === 0) {
+      alert('Beispiele sind bereits geladen.');
+      return;
+    }
+    db.uebungen = (db.uebungen || []).concat(seeds);
+    saveDb();
+    renderUebungenTab();
+  };
+  const loadBtn = document.getElementById('uebung-load-examples');
+  if (loadBtn) loadBtn.onclick = loadSeedsFn;
+  const loadBtnToolbar = document.getElementById('uebung-load-examples-toolbar');
+  if (loadBtnToolbar) loadBtnToolbar.onclick = loadSeedsFn;
+  container.querySelectorAll('[data-katfilter]').forEach(btn => {
+    btn.onclick = () => { uebungKatFilter = btn.dataset.katfilter; renderUebungenTab(); };
+  });
+  container.querySelectorAll('[data-uebung-id]').forEach(card => {
+    card.onclick = () => openUebungModal(card.dataset.uebungId);
+  });
+}
+
+function renderUebungCard(u) {
+  const icon = UEBUNG_KAT_ICON[u.kategorie] || '⚽';
+  const spielerRange = u.spieler_min === u.spieler_max
+    ? u.spieler_min + ' Spieler'
+    : u.spieler_min + '–' + u.spieler_max + ' Spieler';
+
+  const hasImage = u.bilder && u.bilder.length > 0;
+  const bandContent = hasImage
+    ? '<img class="uebung-icon-band-img" src="' + esc(u.bilder[0]) + '" alt="">'
+    : '<span class="uebung-icon">' + icon + '</span>';
+
+  return '<div class="uebung-card" data-uebung-id="' + esc(u.id) + '">' +
+    '<div class="uebung-icon-band">' +
+      bandContent +
+      '<span class="uebung-kat-badge uebung-kat-' + esc(u.kategorie) + '">' + esc(UEBUNG_KAT_LABEL[u.kategorie] || u.kategorie) + '</span>' +
+    '</div>' +
+    '<div class="uebung-body">' +
+      '<p class="uebung-name">' + esc(u.name || '(unbenannt)') + '</p>' +
+      '<div class="uebung-meta">' +
+        '<span class="uebung-meta-item">⏱ ' + esc(u.dauer_min) + ' min</span>' +
+        '<span class="uebung-meta-item">👥 ' + esc(spielerRange) + '</span>' +
+      '</div>' +
+      (u.beschreibung ? '<p class="uebung-beschreibung">' + esc(u.beschreibung) + '</p>' : '') +
+    '</div>' +
+  '</div>';
+}
+
+function resizeImageToDataUrl(file, maxWidth, quality, callback) {
+  if (!file.type || file.type.indexOf('image/') !== 0) {
+    alert('Nur Bilddateien (JPG, PNG, GIF, WebP) werden unterstützt.');
+    return;
+  }
+  if (file.size > 12 * 1024 * 1024) {
+    alert('Bild zu groß (max 12 MB).');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      let w = img.width, h = img.height;
+      if (w > maxWidth) { h = h * (maxWidth / w); w = maxWidth; }
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(w); canvas.height = Math.round(h);
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      try {
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        callback(dataUrl);
+      } catch (err) {
+        alert('Bild konnte nicht verarbeitet werden: ' + err.message);
+      }
+    };
+    img.onerror = () => alert('Bild konnte nicht geladen werden.');
+    img.src = e.target.result;
+  };
+  reader.onerror = () => alert('Datei konnte nicht gelesen werden.');
+  reader.readAsDataURL(file);
+}
+
+function renderUebungImagesSection() {
+  const imgs = (pendingUebung && pendingUebung.bilder) || [];
+  let html = '<div class="form-row" style="grid-template-columns: 1fr; margin-bottom: 11px;">' +
+    '<label style="margin-bottom: 6px;">Bilder (max 2, optional)</label>' +
+    '<div class="u-img-grid" id="u-img-grid">';
+  if (imgs.length === 0) {
+    html += '<button type="button" class="u-img-upload full" data-img-upload>+ Bild hinzufügen</button>';
+  } else {
+    imgs.forEach((url, i) => {
+      const fullCls = imgs.length === 1 ? ' u-img-thumb-full' : '';
+      html += '<div class="u-img-thumb' + fullCls + '">' +
+        '<img src="' + esc(url) + '" alt="Bild ' + (i + 1) + '">' +
+        '<button type="button" class="u-img-remove" data-img-idx="' + i + '" title="Entfernen">×</button>' +
+      '</div>';
+    });
+    if (imgs.length < 2) {
+      html += '<button type="button" class="u-img-upload" data-img-upload>+ Bild hinzufügen</button>';
+    }
+  }
+  html += '</div></div>';
+  return html;
+}
+
+function attachUebungImageHandlers() {
+  const grid = document.getElementById('u-img-grid');
+  if (!grid) return;
+  grid.querySelectorAll('[data-img-upload]').forEach(btn => {
+    btn.onclick = () => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        resizeImageToDataUrl(file, 600, 0.7, (dataUrl) => {
+          if (!pendingUebung.bilder) pendingUebung.bilder = [];
+          if (pendingUebung.bilder.length >= 2) return;
+          pendingUebung.bilder.push(dataUrl);
+          refreshUebungImages();
+        });
+      };
+      input.click();
+    };
+  });
+  grid.querySelectorAll('[data-img-idx]').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.imgIdx, 10);
+      if (!pendingUebung.bilder) return;
+      pendingUebung.bilder.splice(idx, 1);
+      refreshUebungImages();
+    };
+  });
+}
+
+function refreshUebungImages() {
+  const section = document.getElementById('u-img-section');
+  if (!section) return;
+  section.outerHTML = '<div id="u-img-section">' + renderUebungImagesSection() + '</div>';
+  attachUebungImageHandlers();
+}
+
+function renderUebungReadonlyBody(u) {
+  const spielerRange = u.spieler_min === u.spieler_max
+    ? u.spieler_min + ' Spieler'
+    : u.spieler_min + '–' + u.spieler_max + ' Spieler';
+  const imgs = u.bilder || [];
+  let html = '';
+  if (imgs.length > 0) {
+    html += '<div class="u-viewer-img-grid">';
+    imgs.forEach((url, i) => {
+      html += '<div class="u-viewer-img"><img src="' + esc(url) + '" alt="Bild ' + (i + 1) + '"></div>';
+    });
+    html += '</div>';
+  }
+  html += '<div class="u-viewer-meta">' +
+    '<span><span class="uebung-kat-badge uebung-kat-' + esc(u.kategorie) + '" style="position:static;">' + esc(UEBUNG_KAT_LABEL[u.kategorie] || u.kategorie) + '</span></span>' +
+    '<span>⏱ <strong>' + esc(u.dauer_min) + ' min</strong></span>' +
+    '<span>👥 <strong>' + esc(spielerRange) + '</strong></span>' +
+  '</div>';
+  if (u.beschreibung) {
+    html += '<div class="u-viewer-section"><h3>Ablauf</h3><p>' + esc(u.beschreibung) + '</p></div>';
+  }
+  if (u.coaching_punkte) {
+    html += '<div class="u-viewer-section"><h3>Coaching-Punkte</h3><p>' + esc(u.coaching_punkte) + '</p></div>';
+  }
+  if ((u.materialien || []).length) {
+    html += '<div class="u-viewer-section"><h3>Materialien</h3><div class="u-viewer-mat-list">' +
+      u.materialien.map(m => '<span class="u-viewer-mat-chip">' + esc(m) + '</span>').join('') +
+    '</div></div>';
+  }
+  return html;
+}
+
+function openUebungModal(id) {
+  editingUebungId = id || null;
+  const isEdit = !!id;
+  if (isEdit) {
+    const orig = db.uebungen.find(u => u.id === id);
+    if (!orig) return;
+    pendingUebung = JSON.parse(JSON.stringify(orig));
+  } else {
+    pendingUebung = mkUebung({});
+  }
+
+  if (appMode === 'kids') {
+    document.getElementById('uebung-modal-title').textContent = pendingUebung.name || 'Übung';
+    document.getElementById('uebung-modal-delete').style.visibility = 'hidden';
+    document.getElementById('uebung-modal-body').innerHTML = renderUebungReadonlyBody(pendingUebung);
+    document.getElementById('uebung-modal').classList.add('open');
+    return;
+  }
+
+  document.getElementById('uebung-modal-title').textContent = isEdit ? 'Übung bearbeiten' : 'Übung hinzufügen';
+  document.getElementById('uebung-modal-delete').style.visibility = isEdit ? 'visible' : 'hidden';
+
+  const body = document.getElementById('uebung-modal-body');
+  body.innerHTML =
+    '<div id="u-img-section">' + renderUebungImagesSection() + '</div>' +
+    '<div class="form-row"><label for="u-name">Name</label>' +
+      '<input type="text" id="u-name" value="' + esc(pendingUebung.name) + '" placeholder="z.B. Passquadrat 4v2" required></div>' +
+    '<div class="form-row"><label for="u-kategorie">Kategorie</label>' +
+      '<select id="u-kategorie">' +
+        UEBUNG_KATEGORIEN.map(k => '<option value="' + k + '" ' + (pendingUebung.kategorie === k ? 'selected' : '') + '>' + UEBUNG_KAT_LABEL[k] + '</option>').join('') +
+      '</select></div>' +
+    '<div class="form-row"><label for="u-dauer">Dauer (min)</label>' +
+      '<input type="number" id="u-dauer" min="1" max="120" value="' + esc(pendingUebung.dauer_min) + '"></div>' +
+    '<div class="range-row"><label>Spieleranzahl</label>' +
+      '<div class="range-inputs">' +
+        '<input type="number" id="u-spieler-min" min="1" max="30" value="' + esc(pendingUebung.spieler_min) + '">' +
+        '<span>bis</span>' +
+        '<input type="number" id="u-spieler-max" min="1" max="30" value="' + esc(pendingUebung.spieler_max) + '">' +
+      '</div></div>' +
+    '<div class="form-row"><label>Materialien</label>' +
+      '<div class="tag-input-wrap" id="u-mat-wrap">' +
+        (pendingUebung.materialien || []).map((m, i) => renderTagChip(m, i)).join('') +
+        '<input type="text" class="tag-input" id="u-mat-input" placeholder="Material eingeben + Enter">' +
+      '</div></div>' +
+    '<div class="form-row"><label for="u-beschreibung">Beschreibung</label>' +
+      '<textarea id="u-beschreibung" placeholder="Aufbau, Ablauf, Regeln …">' + esc(pendingUebung.beschreibung) + '</textarea></div>' +
+    '<div class="form-row"><label for="u-coaching">Coaching-Punkte</label>' +
+      '<textarea id="u-coaching" placeholder="Worauf achten, was korrigieren …">' + esc(pendingUebung.coaching_punkte) + '</textarea></div>';
+
+  attachTagInputHandlers();
+  attachUebungImageHandlers();
+  document.getElementById('uebung-modal').classList.add('open');
+  setTimeout(() => document.getElementById('u-name').focus(), 50);
+}
+
+function renderTagChip(text, idx) {
+  return '<span class="tag-chip" data-tag-idx="' + idx + '">' + esc(text) +
+    '<button type="button" class="tag-chip-remove" data-tag-idx="' + idx + '" title="Entfernen">×</button>' +
+  '</span>';
+}
+
+function refreshTagChips() {
+  const wrap = document.getElementById('u-mat-wrap');
+  if (!wrap) return;
+  const input = document.getElementById('u-mat-input');
+  const chips = (pendingUebung.materialien || []).map((m, i) => renderTagChip(m, i)).join('');
+  wrap.innerHTML = chips + '<input type="text" class="tag-input" id="u-mat-input" placeholder="Material eingeben + Enter">';
+  attachTagInputHandlers();
+  const newInput = document.getElementById('u-mat-input');
+  if (input === document.activeElement || !input) newInput.focus();
+}
+
+function attachTagInputHandlers() {
+  const input = document.getElementById('u-mat-input');
+  if (!input) return;
+  input.onkeydown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const v = input.value.trim();
+      if (v) {
+        if (!pendingUebung.materialien) pendingUebung.materialien = [];
+        pendingUebung.materialien.push(v);
+        input.value = '';
+        refreshTagChips();
+      }
+    } else if (e.key === 'Backspace' && !input.value && pendingUebung.materialien && pendingUebung.materialien.length) {
+      pendingUebung.materialien.pop();
+      refreshTagChips();
+    }
+  };
+  document.querySelectorAll('#u-mat-wrap .tag-chip-remove').forEach(btn => {
+    btn.onclick = () => {
+      const idx = parseInt(btn.dataset.tagIdx, 10);
+      pendingUebung.materialien.splice(idx, 1);
+      refreshTagChips();
+    };
+  });
+}
+
+function closeUebungModal() {
+  document.getElementById('uebung-modal').classList.remove('open');
+  editingUebungId = null;
+  pendingUebung = null;
+}
+
+function saveUebungModal() {
+  const g = (id) => document.getElementById(id);
+  const matInput = g('u-mat-input');
+  if (matInput && matInput.value.trim()) {
+    if (!pendingUebung.materialien) pendingUebung.materialien = [];
+    pendingUebung.materialien.push(matInput.value.trim());
+  }
+
+  pendingUebung.name = g('u-name').value.trim();
+  pendingUebung.kategorie = g('u-kategorie').value;
+  pendingUebung.dauer_min = Math.max(1, parseInt(g('u-dauer').value, 10) || 15);
+  pendingUebung.spieler_min = Math.max(1, parseInt(g('u-spieler-min').value, 10) || 1);
+  pendingUebung.spieler_max = Math.max(pendingUebung.spieler_min, parseInt(g('u-spieler-max').value, 10) || pendingUebung.spieler_min);
+  pendingUebung.beschreibung = g('u-beschreibung').value.trim();
+  pendingUebung.coaching_punkte = g('u-coaching').value.trim();
+
+  if (!pendingUebung.name) {
+    alert('Name ist Pflicht.');
+    return;
+  }
+
+  if (editingUebungId) {
+    const idx = db.uebungen.findIndex(u => u.id === editingUebungId);
+    if (idx >= 0) db.uebungen[idx] = pendingUebung;
+  } else {
+    db.uebungen.push(pendingUebung);
+  }
+  saveDb();
+  renderUebungenTab();
+  closeUebungModal();
+}
+
+function deleteUebungModal() {
+  if (!editingUebungId) return;
+  const u = db.uebungen.find(x => x.id === editingUebungId);
+  if (!u) return;
+  if (!confirm('Übung "' + u.name + '" wirklich löschen?')) return;
+  db.uebungen = db.uebungen.filter(x => x.id !== editingUebungId);
+  saveDb();
+  renderUebungenTab();
+  closeUebungModal();
+}
+
+function getActiveTrainingsplaene() {
+  return (db.trainingsplaene || []).filter(t => t.mannschaft_id === db.meta.active_mannschaft_id);
+}
+
+function computePhaseDauer(phase) {
+  return (phase.items || []).reduce((sum, it) => {
+    const u = db.uebungen.find(x => x.id === it.uebung_id);
+    const d = (it.dauer_override != null) ? it.dauer_override : (u ? u.dauer_min : 0);
+    return sum + (d || 0);
+  }, 0);
+}
+
+function computeTpDauer(tp) {
+  return (tp.phasen || []).reduce((sum, p) => sum + computePhaseDauer(p), 0);
+}
+
+function countTpItems(tp) {
+  return (tp.phasen || []).reduce((sum, p) => sum + (p.items || []).length, 0);
+}
+
+function renderTrainingsplaeneTab() {
+  if (trainingsplaeneView === 'edit' && editingTrainingsplanId) {
+    renderTrainingsplanEditor();
+  } else {
+    renderTrainingsplaeneList();
+  }
+}
+
+function renderTrainingsplaeneList() {
+  const list = getActiveTrainingsplaene().slice();
+  list.sort((a, b) => (b.datum || '').localeCompare(a.datum || ''));
+
+  const container = document.getElementById('tab-trainingsplaene');
+  const cardsHtml = list.length === 0
+    ? '<div class="empty"><p>Noch keine Trainingspläne.</p><p style="font-size:12px;">Lege einen neuen an, um Übungen zu einer Einheit zu komponieren.</p></div>'
+    : '<div class="tp-list-grid">' + list.map(tp => {
+        const dauer = computeTpDauer(tp);
+        const items = countTpItems(tp);
+        const datumStr = tp.datum ? formatDateDE(tp.datum) : 'Ohne Datum';
+        return '<div class="tp-list-card" data-tp-id="' + esc(tp.id) + '">' +
+          '<p class="tp-list-card-name">' + esc(tp.name) + '</p>' +
+          '<div class="tp-list-card-meta">' +
+            '<span>📅 ' + esc(datumStr) + '</span>' +
+            '<span>⏱ <strong>' + dauer + ' min</strong></span>' +
+            '<span>📋 ' + items + ' Übung' + (items === 1 ? '' : 'en') + '</span>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  container.innerHTML =
+    '<div class="toolbar">' +
+      '<div style="font-size: 13px; color: var(--text-2);">' + list.length + ' ' + (list.length === 1 ? 'Trainingsplan' : 'Trainingspläne') + '</div>' +
+      '<div style="flex:1;"></div>' +
+      '<button class="btn btn-primary" id="tp-add">+ Trainingsplan hinzufügen</button>' +
+    '</div>' +
+    cardsHtml;
+
+  document.getElementById('tp-add').onclick = () => {
+    const fresh = mkTrainingsplan(db.meta.active_mannschaft_id, {});
+    db.trainingsplaene.push(fresh);
+    saveDb();
+    openTrainingsplanEditor(fresh.id);
+  };
+  container.querySelectorAll('[data-tp-id]').forEach(card => {
+    card.onclick = () => openTrainingsplanEditor(card.dataset.tpId);
+  });
+}
+
+function openTrainingsplanEditor(id) {
+  editingTrainingsplanId = id;
+  trainingsplaeneView = 'edit';
+  renderTrainingsplaeneTab();
+}
+
+function closeTrainingsplanEditor() {
+  trainingsplaeneView = 'list';
+  editingTrainingsplanId = null;
+  renderTrainingsplaeneTab();
+}
+
+function renderTrainingsplanEditor() {
+  const tp = (db.trainingsplaene || []).find(x => x.id === editingTrainingsplanId);
+  if (!tp) { closeTrainingsplanEditor(); return; }
+
+  const totalDauer = computeTpDauer(tp);
+  const totalItems = countTpItems(tp);
+
+  const phasenHtml = (tp.phasen || []).map((p, pIdx) => {
+    const phaseDauer = computePhaseDauer(p);
+    const itemsHtml = (p.items || []).length === 0
+      ? '<div class="tp-phase-empty">Noch keine Übungen in dieser Phase.</div>'
+      : p.items.map((it, iIdx) => renderTpItem(it, pIdx, iIdx, p.items.length)).join('');
+    return '<div class="tp-phase">' +
+      '<div class="tp-phase-head">' +
+        '<p class="tp-phase-name">' + esc(p.name) + '</p>' +
+        '<span class="tp-phase-stats"><strong>' + phaseDauer + ' min</strong> · ' + (p.items || []).length + ' Übung' + ((p.items || []).length === 1 ? '' : 'en') + '</span>' +
+      '</div>' +
+      '<div class="tp-phase-body">' +
+        itemsHtml +
+        '<button class="tp-phase-add" data-add-phase="' + pIdx + '">+ Übung hinzufügen</button>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  const container = document.getElementById('tab-trainingsplaene');
+  container.innerHTML =
+    '<div class="tp-editor-top">' +
+      '<button class="aufst-back-btn" id="tp-back">← Trainingspläne</button>' +
+      '<input type="text" id="tp-name" value="' + esc(tp.name) + '" placeholder="Name">' +
+      '<input type="date" id="tp-datum" value="' + esc(tp.datum) + '" title="Datum (optional)">' +
+      '<div class="aufst-spacer"></div>' +
+      '<div class="aufst-count"><strong>' + totalDauer + ' min</strong> · ' + totalItems + ' Übung' + (totalItems === 1 ? '' : 'en') + '</div>' +
+      '<button class="btn btn-danger" id="tp-delete">Löschen</button>' +
+    '</div>' +
+    phasenHtml +
+    '<div class="form-row" style="grid-template-columns: 1fr; margin-top: 18px;">' +
+      '<label for="tp-notizen" style="margin-bottom: 4px;">Notizen zur Einheit</label>' +
+      '<textarea id="tp-notizen" placeholder="Allgemeine Anmerkungen, Fokus der Einheit …">' + esc(tp.notizen || '') + '</textarea>' +
+    '</div>';
+
+  document.getElementById('tp-back').onclick = closeTrainingsplanEditor;
+  document.getElementById('tp-delete').onclick = () => {
+    if (!confirm('Trainingsplan "' + tp.name + '" wirklich löschen?')) return;
+    db.trainingsplaene = db.trainingsplaene.filter(x => x.id !== tp.id);
+    saveDb();
+    closeTrainingsplanEditor();
+  };
+
+  const nameEl = document.getElementById('tp-name');
+  nameEl.onblur = () => {
+    const v = nameEl.value.trim() || 'Unbenannt';
+    if (v !== tp.name) { tp.name = v; saveDb(); }
+  };
+  document.getElementById('tp-datum').onchange = (e) => {
+    tp.datum = e.target.value;
+    saveDb();
+  };
+  document.getElementById('tp-notizen').onblur = (e) => {
+    const v = e.target.value.trim();
+    if (v !== tp.notizen) { tp.notizen = v; saveDb(); }
+  };
+
+  container.querySelectorAll('[data-add-phase]').forEach(btn => {
+    btn.onclick = () => {
+      const pIdx = parseInt(btn.dataset.addPhase, 10);
+      openPickerModal('Übung für „' + tp.phasen[pIdx].name + '" wählen', (ueb) => {
+        tp.phasen[pIdx].items.push({ uebung_id: ueb.id, dauer_override: null, notiz: '' });
+        saveDb();
+        renderTrainingsplaeneTab();
+      });
+    };
+  });
+
+  container.querySelectorAll('[data-item-action]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const pIdx = parseInt(btn.dataset.pIdx, 10);
+      const iIdx = parseInt(btn.dataset.iIdx, 10);
+      const action = btn.dataset.itemAction;
+      const items = tp.phasen[pIdx].items;
+      if (action === 'up' && iIdx > 0) {
+        [items[iIdx - 1], items[iIdx]] = [items[iIdx], items[iIdx - 1]];
+      } else if (action === 'down' && iIdx < items.length - 1) {
+        [items[iIdx + 1], items[iIdx]] = [items[iIdx], items[iIdx + 1]];
+      } else if (action === 'del') {
+        items.splice(iIdx, 1);
+      }
+      saveDb();
+      renderTrainingsplaeneTab();
+    };
+  });
+
+  container.querySelectorAll('[data-item-edit]').forEach(el => {
+    el.onclick = () => {
+      const pIdx = parseInt(el.dataset.pIdx, 10);
+      const iIdx = parseInt(el.dataset.iIdx, 10);
+      openItemModal(tp, pIdx, iIdx);
+    };
+  });
+}
+
+function renderTpItem(it, pIdx, iIdx, total) {
+  const u = db.uebungen.find(x => x.id === it.uebung_id);
+  if (!u) {
+    return '<div class="tp-item">' +
+      '<span class="tp-item-icon">⚠️</span>' +
+      '<div class="tp-item-body">' +
+        '<p class="tp-item-name" style="color: var(--text-3);">Übung nicht mehr verfügbar</p>' +
+      '</div>' +
+      '<div class="tp-item-actions">' +
+        '<button class="icon-btn" data-item-action="del" data-p-idx="' + pIdx + '" data-i-idx="' + iIdx + '" title="Entfernen">×</button>' +
+      '</div>' +
+    '</div>';
+  }
+  const icon = UEBUNG_KAT_ICON[u.kategorie] || '⚽';
+  const dauer = (it.dauer_override != null) ? it.dauer_override : u.dauer_min;
+  const dauerCls = (it.dauer_override != null && it.dauer_override !== u.dauer_min) ? ' override' : '';
+  return '<div class="tp-item">' +
+    '<span class="tp-item-icon">' + icon + '</span>' +
+    '<div class="tp-item-body" data-item-edit data-p-idx="' + pIdx + '" data-i-idx="' + iIdx + '">' +
+      '<p class="tp-item-name">' + esc(u.name) + '</p>' +
+      '<div class="tp-item-meta">' +
+        '<span class="uebung-kat-badge uebung-kat-' + esc(u.kategorie) + '">' + esc(UEBUNG_KAT_LABEL[u.kategorie] || u.kategorie) + '</span>' +
+        '<span>👥 ' + esc(u.spieler_min) + (u.spieler_min === u.spieler_max ? '' : '–' + esc(u.spieler_max)) + '</span>' +
+      '</div>' +
+      (it.notiz ? '<p class="tp-item-notiz">' + esc(it.notiz) + '</p>' : '') +
+    '</div>' +
+    '<span class="tp-item-dauer' + dauerCls + '">' + dauer + ' min</span>' +
+    '<div class="tp-item-actions">' +
+      '<button class="icon-btn" data-item-action="up" data-p-idx="' + pIdx + '" data-i-idx="' + iIdx + '" title="Nach oben"' + (iIdx === 0 ? ' disabled style="opacity:0.3;"' : '') + '>↑</button>' +
+      '<button class="icon-btn" data-item-action="down" data-p-idx="' + pIdx + '" data-i-idx="' + iIdx + '" title="Nach unten"' + (iIdx === total - 1 ? ' disabled style="opacity:0.3;"' : '') + '>↓</button>' +
+      '<button class="icon-btn" data-item-action="del" data-p-idx="' + pIdx + '" data-i-idx="' + iIdx + '" title="Entfernen">×</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function openPickerModal(title, callback) {
+  pickerCallback = callback;
+  pickerSearch = '';
+  pickerKatFilter = 'alle';
+  document.getElementById('picker-modal-title').textContent = title || 'Übung auswählen';
+  renderPickerBody();
+  document.getElementById('picker-modal').classList.add('open');
+  setTimeout(() => { const el = document.getElementById('picker-search'); if (el) el.focus(); }, 50);
+}
+
+function renderPickerBody() {
+  const all = (db.uebungen || []).slice();
+  const q = pickerSearch.toLowerCase().trim();
+  let filtered = pickerKatFilter === 'alle' ? all : all.filter(u => u.kategorie === pickerKatFilter);
+  if (q) {
+    filtered = filtered.filter(u => (u.name + ' ' + (u.beschreibung || '')).toLowerCase().includes(q));
+  }
+  filtered.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  const katCounts = { alle: all.length };
+  UEBUNG_KATEGORIEN.forEach(k => { katCounts[k] = all.filter(u => u.kategorie === k).length; });
+
+  const listHtml = filtered.length === 0
+    ? '<div class="picker-empty">Keine Übungen gefunden.</div>'
+    : filtered.map(u => {
+        const icon = UEBUNG_KAT_ICON[u.kategorie] || '⚽';
+        return '<div class="picker-row" data-uebung-id="' + esc(u.id) + '">' +
+          '<span class="picker-row-icon">' + icon + '</span>' +
+          '<div class="picker-row-body">' +
+            '<p class="picker-row-name">' + esc(u.name) + '</p>' +
+            '<div class="picker-row-meta">' +
+              '<span class="uebung-kat-badge uebung-kat-' + esc(u.kategorie) + '">' + esc(UEBUNG_KAT_LABEL[u.kategorie] || u.kategorie) + '</span>' +
+              '<span>⏱ ' + esc(u.dauer_min) + ' min</span>' +
+              '<span>👥 ' + esc(u.spieler_min) + (u.spieler_min === u.spieler_max ? '' : '–' + esc(u.spieler_max)) + '</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+
+  const body = document.getElementById('picker-modal-body');
+  body.innerHTML =
+    '<div class="picker-toolbar">' +
+      '<input type="search" id="picker-search" class="picker-search" placeholder="Übungen durchsuchen …" value="' + esc(pickerSearch) + '">' +
+    '</div>' +
+    '<div class="filter-pills" style="margin-bottom: 12px;">' +
+      '<button class="filter-pill ' + (pickerKatFilter === 'alle' ? 'active' : '') + '" data-pickerkat="alle">Alle (' + katCounts.alle + ')</button>' +
+      UEBUNG_KATEGORIEN.map(k =>
+        '<button class="filter-pill ' + (pickerKatFilter === k ? 'active' : '') + '" data-pickerkat="' + k + '">' + UEBUNG_KAT_LABEL[k] + ' (' + katCounts[k] + ')</button>'
+      ).join('') +
+    '</div>' +
+    '<div class="picker-list">' + listHtml + '</div>';
+
+  const searchEl = document.getElementById('picker-search');
+  searchEl.oninput = () => { pickerSearch = searchEl.value; renderPickerBody(); setTimeout(() => document.getElementById('picker-search').focus(), 0); };
+
+  body.querySelectorAll('[data-pickerkat]').forEach(btn => {
+    btn.onclick = () => { pickerKatFilter = btn.dataset.pickerkat; renderPickerBody(); };
+  });
+
+  body.querySelectorAll('[data-uebung-id]').forEach(row => {
+    row.onclick = () => {
+      const u = db.uebungen.find(x => x.id === row.dataset.uebungId);
+      if (u && pickerCallback) pickerCallback(u);
+      closePickerModal();
+    };
+  });
+}
+
+function closePickerModal() {
+  document.getElementById('picker-modal').classList.remove('open');
+  pickerCallback = null;
+}
+
+function openItemModal(tp, pIdx, iIdx) {
+  const it = tp.phasen[pIdx].items[iIdx];
+  const u = db.uebungen.find(x => x.id === it.uebung_id);
+  if (!u) return;
+  if (appMode === 'kids') {
+    openUebungModal(u.id);
+    return;
+  }
+  itemEditCtx = { tpId: tp.id, pIdx: pIdx, iIdx: iIdx };
+
+  document.getElementById('item-modal-title').textContent = u.name;
+
+  const currentDauer = (it.dauer_override != null) ? it.dauer_override : u.dauer_min;
+  const body = document.getElementById('item-modal-body');
+  body.innerHTML =
+    '<div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">' +
+      '<span class="uebung-kat-badge uebung-kat-' + esc(u.kategorie) + '" style="position: static;">' + esc(UEBUNG_KAT_LABEL[u.kategorie] || u.kategorie) + '</span>' +
+      '<span style="font-size: 12px; color: var(--text-2);">👥 ' + esc(u.spieler_min) + (u.spieler_min === u.spieler_max ? '' : '–' + esc(u.spieler_max)) + ' Spieler</span>' +
+      '<span style="font-size: 12px; color: var(--text-2);">Standard: ' + esc(u.dauer_min) + ' min</span>' +
+    '</div>' +
+    (u.beschreibung ? '<p style="font-size: 12px; color: var(--text-2); line-height: 1.5; margin: 0 0 14px;">' + esc(u.beschreibung) + '</p>' : '') +
+    '<div class="form-row"><label for="it-dauer">Dauer (min)</label>' +
+      '<input type="number" id="it-dauer" min="1" max="120" value="' + currentDauer + '"></div>' +
+    '<div class="form-row"><label for="it-notiz">Notiz für diese Einheit</label>' +
+      '<textarea id="it-notiz" placeholder="Spezifischer Fokus, Variation, Anpassung …">' + esc(it.notiz || '') + '</textarea></div>';
+
+  document.getElementById('item-modal').classList.add('open');
+  setTimeout(() => document.getElementById('it-dauer').focus(), 50);
+}
+
+function closeItemModal() {
+  document.getElementById('item-modal').classList.remove('open');
+  itemEditCtx = null;
+}
+
+function saveItemModal() {
+  if (appMode === 'kids') { closeItemModal(); return; }
+  if (!itemEditCtx) return;
+  const tp = db.trainingsplaene.find(x => x.id === itemEditCtx.tpId);
+  if (!tp) return;
+  const it = tp.phasen[itemEditCtx.pIdx].items[itemEditCtx.iIdx];
+  const u = db.uebungen.find(x => x.id === it.uebung_id);
+  const dauerInput = parseInt(document.getElementById('it-dauer').value, 10);
+  if (!dauerInput || dauerInput < 1) { alert('Dauer muss mindestens 1 Minute sein.'); return; }
+  it.dauer_override = (u && dauerInput === u.dauer_min) ? null : dauerInput;
+  it.notiz = document.getElementById('it-notiz').value.trim();
+  saveDb();
+  renderTrainingsplaeneTab();
+  closeItemModal();
+}
+
+function removeItemModal() {
+  if (!itemEditCtx) return;
+  const tp = db.trainingsplaene.find(x => x.id === itemEditCtx.tpId);
+  if (!tp) return;
+  tp.phasen[itemEditCtx.pIdx].items.splice(itemEditCtx.iIdx, 1);
+  saveDb();
+  renderTrainingsplaeneTab();
+  closeItemModal();
+}
+
+function getActiveSpielzuege() {
+  return (db.spielzuege || []).filter(s => s.mannschaft_id === db.meta.active_mannschaft_id);
+}
+
+function renderSpielzuegeTab() {
+  if (spielzuegeView === 'edit' && editingSpielzugId) {
+    renderSpielzugEditor();
+  } else {
+    renderSpielzuegeList();
+  }
+}
+
+function renderSpielzuegeList() {
+  const all = getActiveSpielzuege().slice();
+  all.sort((a, b) => a.name.localeCompare(b.name, 'de'));
+
+  const visible = (typeof szListKatFilter === 'undefined' || szListKatFilter === 'alle')
+    ? all
+    : all.filter(s => s.kategorie === szListKatFilter);
+
+  const katCounts = { alle: all.length };
+  SZ_KATEGORIEN.forEach(k => { katCounts[k] = all.filter(s => s.kategorie === k).length; });
+
+  const seedNames = getSeedSpielzuege(db.meta.active_mannschaft_id).map(s => s.name.toLowerCase());
+  const existingLower = new Set(all.map(s => s.name.toLowerCase()));
+  const missingSeeds = seedNames.filter(n => !existingLower.has(n)).length;
+  const toolbarLoadBtn = missingSeeds > 0
+    ? '<button class="btn" id="sz-load-examples-toolbar" title="Mitgelieferte Beispiel-Spielzüge ergänzen">+ ' + missingSeeds + ' Beispiele laden</button>'
+    : '';
+
+  const container = document.getElementById('tab-spielzuege');
+  const emptyHtml = szListKatFilter && szListKatFilter !== 'alle'
+    ? '<div class="empty"><p>Keine Spielzüge in dieser Kategorie.</p></div>'
+    : '<div class="empty"><p>Noch keine Spielzüge.</p><p style="font-size:12px;">Du kannst eigene anlegen oder die mitgelieferten Beispiele laden.</p><button class="btn btn-primary" id="sz-load-examples" style="margin-top: 14px;">' + getSeedSpielzuege(db.meta.active_mannschaft_id).length + ' Beispiel-Spielzüge laden</button></div>';
+  const cardsHtml = visible.length === 0
+    ? emptyHtml
+    : '<div class="sz-list-grid">' + visible.map(sz => {
+        const counts = countElements(sz);
+        return '<div class="sz-list-card" data-sz-id="' + esc(sz.id) + '">' +
+          '<div class="sz-list-thumb">' + renderPitchThumb(sz) + '</div>' +
+          '<div class="sz-list-body">' +
+            '<p class="sz-list-name">' + esc(sz.name) + '</p>' +
+            '<div class="sz-list-meta">' +
+              '<span class="sz-kat-badge sz-kat-' + esc(sz.kategorie) + '">' + esc(SZ_KAT_LABEL[sz.kategorie] || sz.kategorie) + '</span>' +
+              '<span style="font-size: 11px; color: var(--text-2);">' + counts.spieler + 'S · ' + counts.gegner + 'G · ' + counts.pfeil + ' Pfeile</span>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('') + '</div>';
+
+  container.innerHTML =
+    '<div class="toolbar">' +
+      '<div style="font-size: 13px; color: var(--text-2);">' + all.length + ' Spielzug' + (all.length === 1 ? '' : 'üge'.slice(1)) + '</div>' +
+      '<div style="flex:1;"></div>' +
+      toolbarLoadBtn +
+      '<button class="btn btn-primary" id="sz-add">+ Spielzug hinzufügen</button>' +
+    '</div>' +
+    '<div class="filter-pills" style="margin-bottom: 14px;">' +
+      '<button class="filter-pill ' + (!szListKatFilter || szListKatFilter === 'alle' ? 'active' : '') + '" data-szkat="alle">Alle (' + katCounts.alle + ')</button>' +
+      SZ_KATEGORIEN.map(k =>
+        '<button class="filter-pill ' + (szListKatFilter === k ? 'active' : '') + '" data-szkat="' + k + '">' + SZ_KAT_LABEL[k] + ' (' + katCounts[k] + ')</button>'
+      ).join('') +
+    '</div>' +
+    cardsHtml;
+
+  document.getElementById('sz-add').onclick = () => {
+    const fresh = mkSpielzug(db.meta.active_mannschaft_id, {});
+    db.spielzuege.push(fresh);
+    saveDb();
+    openSpielzugEditor(fresh.id);
+  };
+  const loadSeedsFn = () => {
+    const seeds = getSeedSpielzuege(db.meta.active_mannschaft_id);
+    const existing = new Set((db.spielzuege || []).filter(s => s.mannschaft_id === db.meta.active_mannschaft_id).map(s => s.name.toLowerCase()));
+    const toAdd = seeds.filter(s => !existing.has(s.name.toLowerCase()));
+    if (toAdd.length === 0) {
+      alert('Alle Beispiele sind bereits geladen.');
+      return;
+    }
+    db.spielzuege = (db.spielzuege || []).concat(toAdd);
+    saveDb();
+    renderSpielzuegeTab();
+  };
+  const loadBtn = document.getElementById('sz-load-examples');
+  if (loadBtn) loadBtn.onclick = loadSeedsFn;
+  const loadBtnTb = document.getElementById('sz-load-examples-toolbar');
+  if (loadBtnTb) loadBtnTb.onclick = loadSeedsFn;
+  container.querySelectorAll('[data-szkat]').forEach(btn => {
+    btn.onclick = () => { szListKatFilter = btn.dataset.szkat; renderSpielzuegeTab(); };
+  });
+  container.querySelectorAll('[data-sz-id]').forEach(card => {
+    card.onclick = () => openSpielzugEditor(card.dataset.szId);
+  });
+}
+
+function countElements(sz) {
+  const c = { spieler: 0, gegner: 0, ball: 0, pfeil: 0 };
+  (sz.elemente || []).forEach(e => { if (c[e.type] != null) c[e.type]++; });
+  return c;
+}
+
+function openSpielzugEditor(id) {
+  editingSpielzugId = id;
+  spielzuegeView = 'edit';
+  szTool = 'select';
+  szSelectedElId = null;
+  szPfeilStart = null;
+  const sz = (db.spielzuege || []).find(x => x.id === id);
+  szCurrentPhase = sz ? Math.max(1, getMaxPhase(sz)) : 1;
+  renderSpielzuegeTab();
+}
+
+function closeSpielzugEditor() {
+  if (szAnimRunning) stopSzAnimation();
+  spielzuegeView = 'list';
+  editingSpielzugId = null;
+  szTool = 'select';
+  szSelectedElId = null;
+  szPfeilStart = null;
+  renderSpielzuegeTab();
+}
+
+function renderSpielzugViewer(sz) {
+  const counts = countElements(sz);
+  const canPlay = counts.pfeil > 0;
+
+  let instruction = 'Drücke „Abspielen", um den Spielzug zu sehen';
+  let instructionActive = false;
+  if (szAnimRunning) { instruction = '▶ Animation läuft — Klick auf das Feld zum Stoppen'; instructionActive = true; }
+
+  const playBtnHtml = szAnimRunning
+    ? '<button class="sz-viewer-play stop" id="sz-stop">■ Stoppen</button>'
+    : '<button class="sz-viewer-play" id="sz-play"' + (canPlay ? '' : ' disabled') + '>▶ Abspielen</button>';
+
+  const container = document.getElementById('tab-spielzuege');
+  container.innerHTML =
+    '<div class="sz-viewer-top">' +
+      '<button class="aufst-back-btn" id="sz-back">← Zurück</button>' +
+      '<h2 class="sz-viewer-name">' + esc(sz.name) + '</h2>' +
+      '<span class="sz-kat-badge sz-kat-' + esc(sz.kategorie) + '">' + esc(SZ_KAT_LABEL[sz.kategorie] || sz.kategorie) + '</span>' +
+      playBtnHtml +
+    '</div>' +
+    '<div class="sz-viewer-layout">' +
+      '<div class="sz-viewer-pitch-wrap">' +
+        '<div class="sz-viewer-instruction ' + (instructionActive ? 'active' : '') + '">' + instruction + '</div>' +
+        '<div class="sz-viewer-pitch">' + renderSpielzugPitch(sz) + '</div>' +
+      '</div>' +
+      (sz.beschreibung
+        ? '<div class="sz-viewer-description"><h3>Beschreibung</h3>' + esc(sz.beschreibung) + '</div>'
+        : '') +
+    '</div>';
+
+  document.getElementById('sz-back').onclick = closeSpielzugEditor;
+  const playBtn = document.getElementById('sz-play');
+  if (playBtn) playBtn.onclick = () => startSzAnimation(sz);
+  const stopBtn = document.getElementById('sz-stop');
+  if (stopBtn) stopBtn.onclick = () => stopSzAnimation();
+
+  const svg = document.getElementById('sz-pitch');
+  if (svg) {
+    svg.addEventListener('mousedown', () => {
+      if (szAnimRunning) stopSzAnimation();
+    });
+  }
+}
+
+function renderSpielzugEditor() {
+  const sz = (db.spielzuege || []).find(x => x.id === editingSpielzugId);
+  if (!sz) { closeSpielzugEditor(); return; }
+  if (appMode === 'kids') { renderSpielzugViewer(sz); return; }
+  const counts = countElements(sz);
+
+  const tools = [
+    { id: 'select', icon: '↖', title: 'Auswahl (V)' },
+    { divider: true },
+    { id: 'spieler', icon: '🔵', title: 'Eigener Spieler' },
+    { id: 'gegner', icon: '🔴', title: 'Gegner' },
+    { id: 'ball', icon: '⚽', title: 'Ball', disabled: counts.ball > 0 },
+    { divider: true },
+    { id: 'lauf', icon: '→', title: 'Lauf-Pfeil' },
+    { id: 'pass', icon: '⇢', title: 'Pass-Pfeil' },
+    { id: 'dribbel', icon: '〰', title: 'Dribbel-Pfeil' },
+    { divider: true },
+    { id: 'zone', icon: '⬢', title: 'Zone zeichnen' }
+  ];
+
+  const toolbarHtml = tools.map(t => {
+    if (t.divider) return '<div class="sz-tool-divider"></div>';
+    return '<button class="sz-tool ' + (szTool === t.id ? 'active' : '') + '" data-sz-tool="' + t.id + '" title="' + esc(t.title) + '"' + (t.disabled ? ' disabled' : '') + '>' + t.icon + '</button>';
+  }).join('');
+
+  let instruction = 'Auswahl: Element klicken zum Selektieren · Drag zum Verschieben · Entf-Taste zum Löschen';
+  let instructionActive = false;
+  let instructionDanger = false;
+  let deleteBtnHtml = '';
+  if (szAnimRunning) {
+    instruction = '▶ Animation läuft — Klick auf das Feld zum Stoppen';
+    instructionActive = true;
+  } else if (szTool === 'zone') {
+    const pts = szZoneDrawing ? szZoneDrawing.points.length : 0;
+    const colorBtns = ZONE_COLORS.map(c =>
+      '<button type="button" class="sz-zone-color-btn sz-zone-color-' + c + (szZoneColor === c ? ' active' : '') + '" data-zone-color="' + c + '" title="' + ZONE_COLOR_LABEL[c] + '"></button>'
+    ).join('');
+    instruction = 'Zone zeichnen — Klicks setzen Polygon-Ecken' +
+      ' <span class="sz-zone-controls">' + colorBtns +
+      ' <span style="opacity:0.85;">Punkte: <strong>' + pts + '</strong></span>' +
+      ' <button type="button" class="sz-zone-action-btn confirm" id="sz-zone-finish"' + (pts < 3 ? ' disabled' : '') + '>Fertig</button>' +
+      (pts > 0 ? ' <button type="button" class="sz-zone-action-btn" id="sz-zone-cancel">Verwerfen</button>' : '') +
+      '</span>';
+    instructionActive = true;
+  } else if (szTool === 'select' && szSelectedElId) {
+    const selEl = (sz.elemente || []).find(x => x.id === szSelectedElId);
+    if (selEl) {
+      const typLabel = selEl.type === 'spieler' ? 'Spieler' + (selEl.nummer != null ? ' ' + selEl.nummer : '')
+        : selEl.type === 'gegner' ? 'Gegner'
+        : selEl.type === 'ball' ? 'Ball'
+        : selEl.type === 'pfeil' ? (PFEIL_LABEL[selEl.subtyp] || 'Pfeil') + '-Pfeil'
+        : selEl.type === 'zone' ? 'Zone (' + (ZONE_COLOR_LABEL[selEl.color] || selEl.color) + ')'
+        : 'Element';
+      instruction = typLabel + ' ausgewählt';
+      if (selEl.type === 'pfeil') {
+        const allPf = (sz.elemente || []).filter(e => e.type === 'pfeil');
+        const ph = getPfeilPhase(selEl, allPf);
+        instruction += ' <span class="sz-phase-controls">Phase <button data-phase-shift="-1"' + (ph <= 1 ? ' disabled' : '') + '>−</button> <strong>' + ph + '</strong> <button data-phase-shift="1">+</button></span>';
+      } else if (selEl.type === 'zone') {
+        instruction += '<input type="text" class="sz-zone-label-input" id="sz-zone-label-edit" placeholder="Label …" value="' + esc(selEl.label || '') + '">';
+      }
+      instructionDanger = true;
+      deleteBtnHtml = '<button class="sz-instruction-del" id="sz-del-selected" title="Element entfernen">× Löschen</button>';
+    }
+  } else if (szTool === 'spieler') { instruction = 'Klicke auf das Feld, um einen eigenen Spieler zu setzen'; instructionActive = true; }
+  else if (szTool === 'gegner') { instruction = 'Klicke auf das Feld, um einen Gegner zu setzen'; instructionActive = true; }
+  else if (szTool === 'ball') { instruction = 'Klicke auf das Feld, um den Ball zu platzieren'; instructionActive = true; }
+  else if (PFEIL_TYPEN.indexOf(szTool) >= 0) {
+    if (szPfeilStart) instruction = PFEIL_LABEL[szTool] + '-Pfeil (Phase ' + szCurrentPhase + '): jetzt Endpunkt klicken';
+    else instruction = PFEIL_LABEL[szTool] + '-Pfeil (Phase ' + szCurrentPhase + '): Startpunkt klicken';
+    instructionActive = true;
+  }
+
+  const canPlay = counts.pfeil > 0;
+  const playBtnHtml = szAnimRunning
+    ? '<button class="sz-play-btn stop" id="sz-stop">■ Stoppen</button>'
+    : '<button class="sz-play-btn" id="sz-play"' + (canPlay ? '' : ' disabled title="Mindestens ein Pfeil nötig"') + '>▶ Abspielen</button>';
+
+  const phaseIndicatorHtml = szAnimRunning ? '' :
+    '<span class="sz-current-phase" title="Neu gezeichnete Pfeile landen in dieser Phase">Phase: <strong>' + szCurrentPhase + '</strong></span>' +
+    '<button class="sz-newphase-btn" id="sz-newphase" title="Nachfolgende Pfeile in neue Phase legen">+ Neue Phase</button>';
+
+  const container = document.getElementById('tab-spielzuege');
+  container.innerHTML =
+    '<div class="sz-editor-top">' +
+      '<button class="aufst-back-btn" id="sz-back">← Spielzüge</button>' +
+      '<input type="text" id="sz-name" value="' + esc(sz.name) + '" placeholder="Name">' +
+      '<select id="sz-kategorie" title="Kategorie"' + (szAnimRunning ? ' disabled' : '') + '>' +
+        SZ_KATEGORIEN.map(k => '<option value="' + k + '" ' + (sz.kategorie === k ? 'selected' : '') + '>' + SZ_KAT_LABEL[k] + '</option>').join('') +
+      '</select>' +
+      phaseIndicatorHtml +
+      playBtnHtml +
+      '<div class="aufst-spacer"></div>' +
+      '<button class="btn btn-danger" id="sz-delete"' + (szAnimRunning ? ' disabled' : '') + '>Löschen</button>' +
+    '</div>' +
+    '<div class="sz-layout">' +
+      '<div class="sz-toolbar' + (szAnimRunning ? ' dim' : '') + '">' + toolbarHtml + '</div>' +
+      '<div class="sz-pitch-wrap">' +
+        '<div class="sz-instruction ' + (instructionActive ? 'active' : '') + (instructionDanger ? ' danger' : '') + '"><span>' + instruction + '</span>' + deleteBtnHtml + '</div>' +
+        renderSpielzugPitch(sz) +
+      '</div>' +
+      '<div class="sz-sidebar">' +
+        '<div class="sz-sidebar-block">' +
+          '<p class="sz-sidebar-h">Beschreibung</p>' +
+          '<textarea id="sz-beschreibung" placeholder="Ablauf, Schlüsselmoment, Variation …"' + (szAnimRunning ? ' disabled' : '') + '>' + esc(sz.beschreibung || '') + '</textarea>' +
+        '</div>' +
+        '<div class="sz-counts">' +
+          '<span>🔵 ' + counts.spieler + '</span>' +
+          '<span>🔴 ' + counts.gegner + '</span>' +
+          '<span>⚽ ' + counts.ball + '</span>' +
+          '<span>↗ ' + counts.pfeil + '</span>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('sz-back').onclick = closeSpielzugEditor;
+  document.getElementById('sz-delete').onclick = () => {
+    if (!confirm('Spielzug "' + sz.name + '" wirklich löschen?')) return;
+    db.spielzuege = db.spielzuege.filter(x => x.id !== sz.id);
+    saveDb();
+    closeSpielzugEditor();
+  };
+
+  const nameEl = document.getElementById('sz-name');
+  nameEl.onblur = () => {
+    const v = nameEl.value.trim() || 'Unbenannt';
+    if (v !== sz.name) { sz.name = v; saveDb(); }
+  };
+  document.getElementById('sz-kategorie').onchange = (e) => {
+    sz.kategorie = e.target.value; saveDb();
+  };
+  document.getElementById('sz-beschreibung').onblur = (e) => {
+    const v = e.target.value.trim();
+    if (v !== sz.beschreibung) { sz.beschreibung = v; saveDb(); }
+  };
+
+  container.querySelectorAll('[data-sz-tool]').forEach(btn => {
+    btn.onclick = () => {
+      const t = btn.dataset.szTool;
+      szTool = t;
+      szPfeilStart = null;
+      szSelectedElId = null;
+      if (t !== 'zone') szZoneDrawing = null;
+      renderSpielzuegeTab();
+    };
+  });
+
+  const delBtn = document.getElementById('sz-del-selected');
+  if (delBtn) {
+    delBtn.onclick = () => {
+      if (!szSelectedElId) return;
+      sz.elemente = sz.elemente.filter(x => x.id !== szSelectedElId);
+      szSelectedElId = null;
+      saveDb();
+      renderSpielzuegeTab();
+    };
+  }
+
+  const playBtn = document.getElementById('sz-play');
+  if (playBtn) playBtn.onclick = () => startSzAnimation(sz);
+  const stopBtn = document.getElementById('sz-stop');
+  if (stopBtn) stopBtn.onclick = () => stopSzAnimation();
+
+  const newPhaseBtn = document.getElementById('sz-newphase');
+  if (newPhaseBtn) newPhaseBtn.onclick = () => {
+    szCurrentPhase = szCurrentPhase + 1;
+    renderSpielzuegeTab();
+  };
+
+  container.querySelectorAll('[data-phase-shift]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      if (!szSelectedElId) return;
+      const selEl = sz.elemente.find(x => x.id === szSelectedElId);
+      if (!selEl || selEl.type !== 'pfeil') return;
+      const allPf = sz.elemente.filter(e => e.type === 'pfeil');
+      const current = getPfeilPhase(selEl, allPf);
+      const shift = parseInt(btn.dataset.phaseShift, 10);
+      const next = Math.max(1, current + shift);
+      selEl.phase = next;
+      saveDb();
+      renderSpielzuegeTab();
+    };
+  });
+
+  container.querySelectorAll('[data-zone-color]').forEach(btn => {
+    btn.onclick = () => {
+      szZoneColor = btn.dataset.zoneColor;
+      if (szZoneDrawing) szZoneDrawing.color = szZoneColor;
+      renderSpielzuegeTab();
+    };
+  });
+
+  const zoneFinishBtn = document.getElementById('sz-zone-finish');
+  if (zoneFinishBtn) zoneFinishBtn.onclick = () => {
+    if (!szZoneDrawing || szZoneDrawing.points.length < 3) return;
+    const label = prompt('Label für die Zone (z.B. "Raumdeckung", "Pressing-Zone"):', '') || '';
+    sz.elemente.push(mkSzEl('zone', { points: szZoneDrawing.points.slice(), color: szZoneDrawing.color, label: label.trim() }));
+    szZoneDrawing = null;
+    saveDb();
+    renderSpielzuegeTab();
+  };
+  const zoneCancelBtn = document.getElementById('sz-zone-cancel');
+  if (zoneCancelBtn) zoneCancelBtn.onclick = () => {
+    szZoneDrawing = null;
+    renderSpielzuegeTab();
+  };
+
+  const zoneLabelInput = document.getElementById('sz-zone-label-edit');
+  if (zoneLabelInput) {
+    zoneLabelInput.onblur = () => {
+      if (!szSelectedElId) return;
+      const selEl = sz.elemente.find(x => x.id === szSelectedElId);
+      if (!selEl || selEl.type !== 'zone') return;
+      const v = zoneLabelInput.value.trim();
+      if (v !== (selEl.label || '')) { selEl.label = v; saveDb(); renderSpielzuegeTab(); }
+    };
+    zoneLabelInput.onkeydown = (e) => { if (e.key === 'Enter') zoneLabelInput.blur(); };
+  }
+
+  attachPitchHandlers(sz);
+}
+
+function renderPitchThumb(sz) {
+  const allElements = sz.elemente || [];
+  const ctx = { allElements: allElements };
+  const zones = allElements.filter(e => e.type === 'zone');
+  const rest = allElements.filter(e => e.type !== 'zone');
+  return '<svg viewBox="0 0 100 150" preserveAspectRatio="xMidYMid meet">' +
+    pitchBackgroundMarkup() +
+    zones.map(e => renderElMarkup(e, false, ctx)).join('') +
+    rest.map(e => renderElMarkup(e, false, ctx)).join('') +
+    '<defs>' +
+      '<marker id="arr-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="white"/></marker>' +
+      '<marker id="arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ff6b5e"/></marker>' +
+    '</defs>' +
+  '</svg>';
+}
+
+function renderSpielzugPitch(sz) {
+  const allElements = sz.elemente || [];
+  const allPfeile = allElements.filter(e => e.type === 'pfeil');
+  const ctx = { showPhases: true, allPfeile: allPfeile, allElements: allElements };
+  const zones = allElements.filter(e => e.type === 'zone');
+  const rest = allElements.filter(e => e.type !== 'zone');
+
+  let drawingMarkup = '';
+  if (szTool === 'zone' && szZoneDrawing && szZoneDrawing.points.length > 0) {
+    const fill = ZONE_COLOR_FILL[szZoneDrawing.color] || ZONE_COLOR_FILL.green;
+    const stroke = ZONE_COLOR_STROKE[szZoneDrawing.color] || ZONE_COLOR_STROKE.green;
+    const pts = szZoneDrawing.points;
+    const ptsStr = pts.map(p => p.x + ',' + p.y).join(' ');
+    const polygon = pts.length >= 3
+      ? '<polygon points="' + ptsStr + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="0.4" stroke-dasharray="1.2 0.8" stroke-linejoin="round"/>'
+      : (pts.length === 2 ? '<line class="sz-zone-drawing-line" x1="' + pts[0].x + '" y1="' + pts[0].y + '" x2="' + pts[1].x + '" y2="' + pts[1].y + '"/>' : '');
+    const dots = pts.map(p => '<circle class="sz-zone-drawing-point" cx="' + p.x + '" cy="' + p.y + '" r="1.2"/>').join('');
+    drawingMarkup = polygon + dots;
+  }
+
+  const pitchToolCls = szTool === 'zone' ? 'tool-place'
+    : (PFEIL_TYPEN.indexOf(szTool) >= 0 ? 'tool-pfeil'
+    : (szTool === 'select' ? 'tool-select' : 'tool-place'));
+
+  return '<svg viewBox="0 0 100 150" class="sz-pitch ' + pitchToolCls + '" id="sz-pitch" preserveAspectRatio="xMidYMid meet">' +
+    pitchBackgroundMarkup() +
+    zones.map(el => renderElMarkup(el, el.id === szSelectedElId, ctx)).join('') +
+    drawingMarkup +
+    rest.map(el => renderElMarkup(el, el.id === szSelectedElId, ctx)).join('') +
+    (szPfeilStart ? '<circle cx="' + szPfeilStart.x + '" cy="' + szPfeilStart.y + '" r="1.5" fill="var(--accent)" stroke="white" stroke-width="0.3"/>' : '') +
+    '<defs>' +
+      '<marker id="arr-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="white"/></marker>' +
+      '<marker id="arr-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#ff6b5e"/></marker>' +
+      '<marker id="arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--accent)"/></marker>' +
+    '</defs>' +
+  '</svg>';
+}
+
+function pitchBackgroundMarkup() {
+  return '<defs>' +
+    '<linearGradient id="sz-grad" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#5e8c1f"/>' +
+      '<stop offset="1" stop-color="#4a7117"/>' +
+    '</linearGradient>' +
+  '</defs>' +
+  '<rect width="100" height="150" fill="url(#sz-grad)"/>' +
+  '<g stroke="white" stroke-width="0.35" fill="none" opacity="0.55" stroke-linejoin="round">' +
+    '<rect x="1" y="1" width="98" height="148" />' +
+    '<line x1="1" y1="75" x2="99" y2="75" />' +
+    '<circle cx="50" cy="75" r="10" />' +
+    '<circle cx="50" cy="75" r="0.6" fill="white" stroke="none"/>' +
+    '<rect x="22" y="1" width="56" height="20" />' +
+    '<rect x="36" y="1" width="28" height="7" />' +
+    '<path d="M 38 21 A 12 12 0 0 0 62 21" />' +
+    '<rect x="22" y="129" width="56" height="20" />' +
+    '<rect x="36" y="142" width="28" height="7" />' +
+    '<path d="M 38 129 A 12 12 0 0 1 62 129" />' +
+  '</g>';
+}
+
+function renderElMarkup(el, selected, ctx) {
+  const sel = selected ? ' selected' : '';
+  if (el.type === 'zone') {
+    const points = (el.points || []).map(p => p.x + ',' + p.y).join(' ');
+    const fill = ZONE_COLOR_FILL[el.color] || ZONE_COLOR_FILL.green;
+    const stroke = ZONE_COLOR_STROKE[el.color] || ZONE_COLOR_STROKE.green;
+    let labelMarkup = '';
+    if (el.label) {
+      let cx = 0, cy = 0;
+      (el.points || []).forEach(p => { cx += p.x; cy += p.y; });
+      const n = Math.max(1, (el.points || []).length);
+      cx /= n; cy /= n;
+      labelMarkup = '<text class="sz-zone-label" x="' + cx + '" y="' + cy + '">' + esc(el.label) + '</text>';
+    }
+    return '<g class="sz-zone' + sel + '" data-el-id="' + esc(el.id) + '">' +
+      '<polygon points="' + points + '" fill="' + fill + '" stroke="' + stroke + '" stroke-width="0.4" stroke-linejoin="round"/>' +
+      labelMarkup +
+    '</g>';
+  }
+  if (el.type === 'spieler' || el.type === 'gegner') {
+    const cls = el.type === 'spieler' ? 'sz-el-spieler' : 'sz-el-gegner';
+    const label = el.type === 'spieler' ? (el.nummer != null ? esc(el.nummer) : '') : '×';
+    const labelCls = el.type === 'spieler' ? 'sz-el-num' : 'sz-el-x';
+    return '<g class="sz-el' + sel + '" data-el-id="' + esc(el.id) + '" transform="translate(' + el.x + ',' + el.y + ')">' +
+      (selected ? '<circle class="sz-el-halo" r="4.6"/>' : '') +
+      '<circle class="sz-el-bg ' + cls + '" r="3.2"/>' +
+      '<text class="' + labelCls + '">' + label + '</text>' +
+    '</g>';
+  }
+  if (el.type === 'ball') {
+    return '<g class="sz-el' + sel + '" data-el-id="' + esc(el.id) + '" transform="translate(' + el.x + ',' + el.y + ')">' +
+      (selected ? '<circle class="sz-el-halo" r="3.2"/>' : '') +
+      '<circle class="sz-el-bg sz-el-ball" r="1.8"/>' +
+    '</g>';
+  }
+  if (el.type === 'pfeil') {
+    const cls = 'sz-pfeil-' + (el.subtyp || 'lauf');
+    let isFoe = false;
+    if (ctx && ctx.allElements) {
+      let closest = null, closestDist = 6;
+      ctx.allElements.forEach(e => {
+        if (e.type !== 'spieler' && e.type !== 'gegner') return;
+        const dx = e.x - el.x1, dy = e.y - el.y1;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < closestDist) { closest = e; closestDist = d; }
+      });
+      if (closest && closest.type === 'gegner') isFoe = true;
+    }
+    const marker = isFoe ? 'arr-r' : 'arr-w';
+    let pathMarkup;
+    if (el.subtyp === 'dribbel') {
+      pathMarkup = '<path d="' + wavyPath(el.x1, el.y1, el.x2, el.y2) + '" class="' + cls + '" marker-end="url(#' + marker + ')"/>';
+    } else {
+      pathMarkup = '<line x1="' + el.x1 + '" y1="' + el.y1 + '" x2="' + el.x2 + '" y2="' + el.y2 + '" class="' + cls + '" marker-end="url(#' + marker + ')"/>';
+    }
+    const hitPath = el.subtyp === 'dribbel'
+      ? '<path d="' + wavyPath(el.x1, el.y1, el.x2, el.y2) + '" class="sz-pfeil-hit"/>'
+      : '<line x1="' + el.x1 + '" y1="' + el.y1 + '" x2="' + el.x2 + '" y2="' + el.y2 + '" class="sz-pfeil-hit"/>';
+    const showPhase = ctx && ctx.showPhases;
+    const phase = ctx && ctx.allPfeile ? getPfeilPhase(el, ctx.allPfeile) : null;
+    const midX = (el.x1 + el.x2) / 2;
+    const midY = (el.y1 + el.y2) / 2;
+    const phaseBadge = (showPhase && phase != null)
+      ? '<g class="sz-phase-badge" transform="translate(' + midX + ',' + midY + ')"><circle r="2.4"/><text>' + phase + '</text></g>'
+      : '';
+    const phaseAttr = phase != null ? ' data-phase="' + phase + '"' : '';
+    return '<g class="sz-pfeil' + sel + (isFoe ? ' foe' : '') + '" data-el-id="' + esc(el.id) + '"' + phaseAttr + '>' +
+      pathMarkup + hitPath + phaseBadge +
+    '</g>';
+  }
+  return '';
+}
+
+function wavyPath(x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  if (len < 0.5) return 'M ' + x1 + ' ' + y1 + ' L ' + x2 + ' ' + y2;
+  const nx = -dy / len, ny = dx / len;
+  const waves = Math.max(2, Math.round(len / 4));
+  const amp = 1.2;
+  let path = 'M ' + x1 + ' ' + y1;
+  for (let i = 1; i <= waves; i++) {
+    const t1 = (i - 0.5) / waves;
+    const t2 = i / waves;
+    const sign = (i % 2 === 1) ? 1 : -1;
+    const cx = x1 + dx * t1 + nx * amp * sign;
+    const cy = y1 + dy * t1 + ny * amp * sign;
+    const ex = x1 + dx * t2;
+    const ey = y1 + dy * t2;
+    path += ' Q ' + cx + ' ' + cy + ' ' + ex + ' ' + ey;
+  }
+  return path;
+}
+
+function getSzPoint(svg, evt) {
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX;
+  pt.y = evt.clientY;
+  const ctm = svg.getScreenCTM();
+  if (!ctm) return { x: 50, y: 75 };
+  const tr = pt.matrixTransform(ctm.inverse());
+  return { x: Math.max(2, Math.min(98, tr.x)), y: Math.max(2, Math.min(148, tr.y)) };
+}
+
+function attachPitchHandlers(sz) {
+  const svg = document.getElementById('sz-pitch');
+  if (!svg) return;
+
+  svg.addEventListener('mousedown', (e) => {
+    if (szAnimRunning) { stopSzAnimation(); return; }
+    if (document.activeElement && document.activeElement.blur && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA')) {
+      document.activeElement.blur();
+    }
+    const elTarget = e.target.closest('[data-el-id]');
+    const elId = elTarget ? elTarget.dataset.elId : null;
+    const pt = getSzPoint(svg, e);
+
+    if (szTool === 'select') {
+      if (elId) {
+        szSelectedElId = elId;
+        const el = sz.elemente.find(x => x.id === elId);
+        if (el && (el.type === 'spieler' || el.type === 'gegner' || el.type === 'ball')) {
+          szDragging = { elId: elId, offsetX: el.x - pt.x, offsetY: el.y - pt.y, moved: false };
+        }
+        renderSpielzuegeTab();
+      } else {
+        if (szSelectedElId) { szSelectedElId = null; renderSpielzuegeTab(); }
+      }
+      return;
+    }
+
+    if (szTool === 'spieler' || szTool === 'gegner') {
+      const nummer = szTool === 'spieler' ? (countElements(sz).spieler + 1) : null;
+      sz.elemente.push(mkSzEl(szTool, { x: pt.x, y: pt.y, nummer: nummer }));
+      saveDb();
+      renderSpielzuegeTab();
+      return;
+    }
+    if (szTool === 'ball') {
+      if (countElements(sz).ball > 0) return;
+      sz.elemente.push(mkSzEl('ball', { x: pt.x, y: pt.y }));
+      saveDb();
+      renderSpielzuegeTab();
+      return;
+    }
+    if (PFEIL_TYPEN.indexOf(szTool) >= 0) {
+      if (!szPfeilStart) {
+        szPfeilStart = { x: pt.x, y: pt.y };
+        renderSpielzuegeTab();
+      } else {
+        sz.elemente.push(mkSzEl('pfeil', { subtyp: szTool, x1: szPfeilStart.x, y1: szPfeilStart.y, x2: pt.x, y2: pt.y, phase: szCurrentPhase }));
+        szPfeilStart = null;
+        saveDb();
+        renderSpielzuegeTab();
+      }
+      return;
+    }
+    if (szTool === 'zone') {
+      if (!szZoneDrawing) szZoneDrawing = { color: szZoneColor, points: [] };
+      szZoneDrawing.points.push({ x: pt.x, y: pt.y });
+      renderSpielzuegeTab();
+      return;
+    }
+  });
+
+  svg.addEventListener('mousemove', (e) => {
+    if (!szDragging) return;
+    const el = sz.elemente.find(x => x.id === szDragging.elId);
+    if (!el) return;
+    const pt = getSzPoint(svg, e);
+    el.x = Math.max(2, Math.min(98, pt.x + szDragging.offsetX));
+    el.y = Math.max(2, Math.min(148, pt.y + szDragging.offsetY));
+    szDragging.moved = true;
+    const g = svg.querySelector('[data-el-id="' + el.id + '"]');
+    if (g) g.setAttribute('transform', 'translate(' + el.x + ',' + el.y + ')');
+  });
+
+  const endDrag = () => {
+    if (szDragging) {
+      if (szDragging.moved) saveDb();
+      szDragging = null;
+    }
+  };
+  svg.addEventListener('mouseup', endDrag);
+  svg.addEventListener('mouseleave', endDrag);
+}
+
+function buildAnimSteps(sz) {
+  const elements = sz.elemente || [];
+  const allPfeile = elements.filter(e => e.type === 'pfeil');
+  if (allPfeile.length === 0) return [];
+
+  const sim = {};
+  elements.forEach(e => { if (e.x != null) sim[e.id] = { x: e.x, y: e.y }; });
+
+  const ball = elements.find(e => e.type === 'ball');
+
+  const phaseGroups = {};
+  allPfeile.forEach(p => {
+    const ph = getPfeilPhase(p, allPfeile);
+    if (!phaseGroups[ph]) phaseGroups[ph] = [];
+    phaseGroups[ph].push(p);
+  });
+  const phaseNumbers = Object.keys(phaseGroups).map(n => parseInt(n, 10)).sort((a, b) => a - b);
+
+  const steps = [];
+  phaseNumbers.forEach(phaseNum => {
+    const pfeileInPhase = phaseGroups[phaseNum];
+    const moves = [];
+    const claimed = {};
+
+    pfeileInPhase.forEach(p => {
+      if (p.subtyp === 'pass') {
+        if (ball && sim[ball.id] && !claimed[ball.id]) {
+          moves.push({ elId: ball.id, from: { x: sim[ball.id].x, y: sim[ball.id].y }, to: { x: p.x2, y: p.y2 } });
+          claimed[ball.id] = true;
+        }
+      } else {
+        let closest = null, closestDist = 6;
+        elements.forEach(e => {
+          if (e.type !== 'spieler' && e.type !== 'gegner') return;
+          if (claimed[e.id]) return;
+          const pos = sim[e.id]; if (!pos) return;
+          const dx = pos.x - p.x1, dy = pos.y - p.y1;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          if (d < closestDist) { closest = e; closestDist = d; }
+        });
+        if (closest) {
+          moves.push({ elId: closest.id, from: { x: sim[closest.id].x, y: sim[closest.id].y }, to: { x: p.x2, y: p.y2 } });
+          claimed[closest.id] = true;
+        }
+        if (p.subtyp === 'dribbel' && ball && sim[ball.id] && !claimed[ball.id]) {
+          moves.push({ elId: ball.id, from: { x: sim[ball.id].x, y: sim[ball.id].y }, to: { x: p.x2, y: p.y2 } });
+          claimed[ball.id] = true;
+        }
+      }
+    });
+
+    moves.forEach(m => { sim[m.elId] = { x: m.to.x, y: m.to.y }; });
+    if (moves.length) steps.push({ moves: moves, phase: phaseNum });
+  });
+
+  return steps;
+}
+
+function setSzElPosition(elId, x, y) {
+  const svg = document.getElementById('sz-pitch');
+  if (!svg) return;
+  const g = svg.querySelector('[data-el-id="' + elId + '"]');
+  if (g && g.tagName.toLowerCase() === 'g' && !g.classList.contains('sz-pfeil')) {
+    g.setAttribute('transform', 'translate(' + x + ',' + y + ')');
+  }
+}
+
+function szEaseInOut(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+
+function startSzAnimation(sz) {
+  if (szAnimRunning) return;
+  const steps = buildAnimSteps(sz);
+  if (steps.length === 0) {
+    alert('Kein animierbarer Pfeil gefunden. Lege mindestens einen Pass-, Lauf- oder Dribbel-Pfeil mit Spieler oder Ball am Startpunkt an.');
+    return;
+  }
+
+  const allPfeile = (sz.elemente || []).filter(e => e.type === 'pfeil');
+  const pfeileByPhase = {};
+  allPfeile.forEach(p => {
+    const ph = getPfeilPhase(p, allPfeile);
+    if (!pfeileByPhase[ph]) pfeileByPhase[ph] = [];
+    pfeileByPhase[ph].push(p.id);
+  });
+
+  szAnimRunning = true;
+  szSelectedElId = null;
+  szPfeilStart = null;
+  renderSpielzuegeTab();
+
+  // Initial: alle Pfeile ausblenden
+  const svg = document.getElementById('sz-pitch');
+  if (svg) {
+    svg.querySelectorAll('.sz-pfeil').forEach(g => g.classList.add('anim-hidden'));
+  }
+
+  const STEP_DUR = 1400;
+  const PAUSE = 250;
+  const FADE_IN = 350;
+  const INITIAL_DELAY = 450;
+  let stepIdx = 0;
+
+  function runStep() {
+    if (!szAnimRunning) return;
+    if (stepIdx >= steps.length) {
+      szAnimTimeout = setTimeout(() => { stopSzAnimation(); }, 900);
+      return;
+    }
+    const step = steps[stepIdx];
+    const phaseNum = step.phase;
+
+    // Pfeile der aktuellen Phase einblenden
+    const svg2 = document.getElementById('sz-pitch');
+    if (svg2 && phaseNum != null) {
+      const ids = pfeileByPhase[phaseNum] || [];
+      ids.forEach(id => {
+        const g = svg2.querySelector('[data-el-id="' + id + '"]');
+        if (g) g.classList.remove('anim-hidden');
+      });
+    }
+
+    // Kurze Fade-In Zeit, dann Bewegung
+    szAnimTimeout = setTimeout(() => {
+      if (!szAnimRunning) return;
+      const stepStart = performance.now();
+      function frame(now) {
+        if (!szAnimRunning) return;
+        const elapsed = now - stepStart;
+        const t = Math.min(1, elapsed / STEP_DUR);
+        const eased = szEaseInOut(t);
+        step.moves.forEach(m => {
+          const x = m.from.x + (m.to.x - m.from.x) * eased;
+          const y = m.from.y + (m.to.y - m.from.y) * eased;
+          setSzElPosition(m.elId, x, y);
+        });
+        if (t < 1) {
+          szAnimRAF = requestAnimationFrame(frame);
+        } else {
+          step.moves.forEach(m => setSzElPosition(m.elId, m.to.x, m.to.y));
+          stepIdx++;
+          szAnimTimeout = setTimeout(runStep, PAUSE);
+        }
+      }
+      szAnimRAF = requestAnimationFrame(frame);
+    }, FADE_IN);
+  }
+
+  szAnimTimeout = setTimeout(runStep, INITIAL_DELAY);
+}
+
+function stopSzAnimation() {
+  if (szAnimRAF) cancelAnimationFrame(szAnimRAF);
+  if (szAnimTimeout) clearTimeout(szAnimTimeout);
+  szAnimRAF = null;
+  szAnimTimeout = null;
+  if (!szAnimRunning) return;
+  szAnimRunning = false;
+  renderSpielzuegeTab();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (spielzuegeView !== 'edit' || !editingSpielzugId) return;
+  if (szAnimRunning) {
+    if (e.key === 'Escape') stopSzAnimation();
+    return;
+  }
+  if (e.key === 'Escape') {
+    if (szZoneDrawing) { szZoneDrawing = null; renderSpielzuegeTab(); return; }
+    if (szPfeilStart) { szPfeilStart = null; renderSpielzuegeTab(); return; }
+  }
+  const activeTag = document.activeElement ? document.activeElement.tagName : '';
+  if (activeTag === 'INPUT' || activeTag === 'TEXTAREA') return;
+  if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+  if (!szSelectedElId) return;
+  const sz = db.spielzuege.find(x => x.id === editingSpielzugId);
+  if (!sz) return;
+  sz.elemente = sz.elemente.filter(x => x.id !== szSelectedElId);
+  szSelectedElId = null;
+  saveDb();
+  renderSpielzuegeTab();
+});
+
+document.getElementById('picker-modal-close').onclick = closePickerModal;
+document.getElementById('picker-modal-cancel').onclick = closePickerModal;
+document.getElementById('picker-modal').onclick = (e) => {
+  if (e.target.id === 'picker-modal') closePickerModal();
+};
+document.getElementById('item-modal-close').onclick = closeItemModal;
+document.getElementById('item-modal-cancel').onclick = closeItemModal;
+document.getElementById('item-modal-save').onclick = saveItemModal;
+document.getElementById('item-modal-remove').onclick = removeItemModal;
+document.getElementById('item-modal').onclick = (e) => {
+  if (e.target.id === 'item-modal') closeItemModal();
+};
+
+document.getElementById('uebung-modal-close').onclick = closeUebungModal;
+document.getElementById('uebung-modal-cancel').onclick = closeUebungModal;
+document.getElementById('uebung-modal-save').onclick = saveUebungModal;
+document.getElementById('uebung-modal-delete').onclick = deleteUebungModal;
+document.getElementById('uebung-modal').onclick = (e) => {
+  if (e.target.id === 'uebung-modal') closeUebungModal();
+};
+
+document.getElementById('modal-close').onclick = closeSpielerModal;
+document.getElementById('modal-cancel').onclick = closeSpielerModal;
+document.getElementById('modal-save').onclick = saveSpielerModal;
+document.getElementById('modal-delete').onclick = deleteSpielerModal;
+document.getElementById('spieler-modal').onclick = (e) => {
+  if (e.target.id === 'spieler-modal') closeSpielerModal();
+};
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (document.getElementById('spieler-modal').classList.contains('open')) closeSpielerModal();
+  else if (document.getElementById('termin-modal').classList.contains('open')) closeTerminModal();
+  else if (document.getElementById('uebung-modal').classList.contains('open')) closeUebungModal();
+  else if (document.getElementById('item-modal').classList.contains('open')) closeItemModal();
+  else if (document.getElementById('picker-modal').classList.contains('open')) closePickerModal();
+});
+
+document.getElementById('export-btn').onclick = () => {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'coach_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+document.getElementById('import-btn').onclick = () => {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if (!imported || !imported.meta || !Array.isArray(imported.spieler)) {
+          alert('Ungültiges Backup-Format.');
+          return;
+        }
+        if (!confirm('Bestehende Daten überschreiben? Empfehlung: vorher exportieren.')) return;
+        db = Object.assign({}, DEFAULT_DB, imported);
+        saveDb();
+        renderActiveTeam();
+        renderSpielerTab();
+        renderTermineTab();
+        renderAufstellungenTab();
+        renderUebungenTab();
+        renderTrainingsplaeneTab();
+        renderSpielzuegeTab();
+        alert('Import erfolgreich.');
+      } catch (err) {
+        alert('Fehler beim Import: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+};
+
+TAB_RENDERERS.spieler = renderSpielerTab;
+TAB_RENDERERS.termine = renderTermineTab;
+TAB_RENDERERS.aufstellungen = renderAufstellungenTab;
+TAB_RENDERERS.uebungen = renderUebungenTab;
+TAB_RENDERERS.trainingsplaene = renderTrainingsplaeneTab;
+TAB_RENDERERS.spielzuege = renderSpielzuegeTab;
+
+document.querySelectorAll('.mode-pill').forEach(btn => {
+  btn.onclick = () => setAppMode(btn.dataset.mode);
+});
+updateModePills();
+if (appMode === 'kids') {
+  const target = document.querySelector('.tab[data-tab="spielzuege"]');
+  if (target) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === target));
+    document.querySelectorAll('.tab-content').forEach(c => { c.hidden = c.id !== 'tab-spielzuege'; });
+    renderSpielzuegeTab();
+  }
+}
+
+renderActiveTeam();
+renderSpielerTab();
+
+// PWA: Service-Worker registrieren (nur unter https:// oder localhost — file:// wird übersprungen)
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then((reg) => {
+      console.log('[Coach] Service-Worker registriert:', reg.scope);
+    }).catch((err) => {
+      console.warn('[Coach] Service-Worker-Registrierung fehlgeschlagen:', err);
+    });
+  });
+}
+</script>
+</body>
+</html>
